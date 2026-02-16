@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 <!-- New entries go here -->
 
+## [3.27.3] - 2026-02-16
+
+### Updated
+
+- **Claude Code Releases**: Updated tracking v2.1.41 → v2.1.42
+  - v2.1.42: Startup optimization (deferred Zod schema), prompt cache hit rate improvement (date outside system prompt), Opus 4.6 effort callout, `/resume` and image error UX fixes
+
 ## [3.27.2] - 2026-02-15
 
 ### Added

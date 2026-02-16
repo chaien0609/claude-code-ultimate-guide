@@ -21,6 +21,7 @@ tags: [ai-ecosystem, guide, workflows, integration]
 - [4. NotebookLM (Synthesis & Audio)](#4-notebooklm-synthesis--audio)
 - [5. Voice-to-Text Tools (Wispr Flow, Superwhisper)](#5-voice-to-text-tools-wispr-flow-superwhisper)
 - [6. IDE-Based Tools (Cursor, Windsurf, Cline)](#6-ide-based-tools-cursor-windsurf-cline)
+- [6.1 Google Antigravity (Agent-First IDE)](#61-google-antigravity-agent-first-ide)
 - [7. UI Prototypers (v0, Bolt, Lovable)](#7-ui-prototypers-v0-bolt-lovable)
 - [8. Workflow Orchestration](#8-workflow-orchestration)
 - [9. Cost & Subscription Strategy](#9-cost--subscription-strategy)
@@ -1359,6 +1360,49 @@ When you need Claude's deeper analysis:
 1. Select code in IDE
 2. Copy with context (file path, line numbers)
 3. Paste in Claude with: "Analyze this and suggest architectural improvements"
+
+---
+
+## 6.1 Google Antigravity (Agent-First IDE)
+
+> **Source**: [Google Codelabs](https://codelabs.developers.google.com/getting-started-google-antigravity), [Google Cloud Blog](https://cloud.google.com/blog/topics/developers-practitioners/choosing-antigravity-or-gemini-cli), community reviews (Feb 2026)
+
+Google Antigravity is an **agent-first IDE** (VS Code fork) launched late 2025. Unlike traditional IDE tools that add AI to an editor, Antigravity makes autonomous agents the primary interface — developers supervise through a mission control-style UI rather than writing code directly.
+
+### Claude Code vs Antigravity: Two Philosophies
+
+| Dimension | Claude Code | Google Antigravity |
+|-----------|-------------|-------------------|
+| **Paradigm** | Terminal-first, CLI-native | Agent-first, IDE-native |
+| **Developer control** | Explicit approval per edit | Higher agent autonomy |
+| **Context model** | Codebase-level via CLAUDE.md | Multi-surface (editor + browser + terminal) |
+| **Multi-agent** | Agent Teams (v2.1+) | Built-in multi-agent orchestration |
+| **CI/CD** | Native (headless, pipelines) | Not mature yet |
+| **Risk profile** | Predictable, conservative | Higher autonomy = higher overstep risk |
+| **Skills format** | `.claude/skills/` (YAML frontmatter) | Directory-based, different ecosystem |
+| **Models** | Claude (Anthropic) | Multi-model (Gemini, Claude, Liquid AI) |
+
+### Bridge: antigravity-claude-proxy
+
+A community [npm package](https://www.npmjs.com/package/antigravity-claude-proxy) exposes an Anthropic-compatible API backed by Antigravity's Cloud Code service. This lets developers use Claude models through Antigravity's interface, or chain both tools in a single workflow.
+
+### When to Consider Antigravity
+
+| Scenario | Recommendation |
+|----------|---------------|
+| Rapid prototyping ("vibe coding") | Antigravity (higher autonomy, visual feedback) |
+| Production code with CI/CD | Claude Code (predictable, headless, pipeline-native) |
+| Multi-model experimentation | Antigravity (~150 models via OpenRouter) |
+| Team standardization | Claude Code (CLAUDE.md, skills, hooks ecosystem) |
+| Non-CLI developers | Antigravity (IDE-native, less terminal friction) |
+
+### Trade-offs to Know
+
+**Antigravity strengths**: Broader visual context (agents "see" browser + editor), parallel agent orchestration, lower barrier for non-CLI developers.
+
+**Antigravity weaknesses**: Higher cognitive overhead (monitoring multiple agents), less predictable behavior, CI/CD not mature, destructive operations risk when agents act autonomously.
+
+**Bottom line**: Claude Code optimizes for **predictability and integration with existing developer workflows**. Antigravity optimizes for **maximum agent autonomy with experimental trade-offs**. They serve different philosophies — choose based on your risk tolerance and workflow preferences.
 
 ---
 

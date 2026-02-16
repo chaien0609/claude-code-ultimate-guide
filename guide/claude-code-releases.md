@@ -10,7 +10,7 @@ tags: [reference, release]
 > **Full details**: [github.com/anthropics/claude-code/CHANGELOG.md](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)
 > **Machine-readable**: [claude-code-releases.yaml](../machine-readable/claude-code-releases.yaml)
 
-**Latest**: v2.1.41 | **Updated**: 2026-02-13
+**Latest**: v2.1.42 | **Updated**: 2026-02-16
 
 ---
 
@@ -24,6 +24,14 @@ tags: [reference, release]
 ---
 
 ## 2.1.x Series (January-February 2026)
+
+### v2.1.42 (2026-02-14)
+
+- **Improved**: Startup performance via deferred Zod schema construction (faster on large projects)
+- **Improved**: Prompt cache hit rate by moving date outside the system prompt (avoids daily cache invalidation)
+- **New**: Opus 4.6 effort callout for eligible users (one-time onboarding)
+- Fixed: `/resume` showing interrupt messages as session titles
+- Fixed: Image dimension limit errors now suggest using `/compact` instead of opaque failure
 
 ### v2.1.41 (2026-02-13)
 
