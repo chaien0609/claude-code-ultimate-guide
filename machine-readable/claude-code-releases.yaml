@@ -27,19 +27,22 @@ releases:
   - version: "2.1.41"
     date: "2026-02-13"
     highlights:
+      - "Guard against launching Claude Code inside another Claude Code session"
       - "`claude auth login/status/logout` CLI subcommands"
       - "Windows ARM64 (win32-arm64) native binary support"
+      - "`speed` attribute in OTel events for fast mode visibility"
       - "`/rename` auto-generates session name from conversation context"
-      - "Multiple stability fixes (FileReadTool FIFOs, background tasks, stale permissions)"
+      - "Fixed Agent Teams wrong model for Bedrock/Vertex/Foundry"
+      - "Multiple stability fixes (FileReadTool FIFOs, MCP images, background tasks, stale permissions)"
     breaking: []
 
   - version: "2.1.39"
-    date: "2026-02-11"
+    date: "2026-02-10"
     highlights:
-      - "Guard against launching Claude Code inside another Claude Code session"
-      - "Fixed Agent Teams wrong model for Bedrock/Vertex/Foundry"
-      - "`speed` attribute in OTel events for fast mode visibility"
-      - "Multiple stability fixes (rendering, session close, fatal errors)"
+      - "Improved terminal rendering performance"
+      - "Fixed fatal errors being swallowed instead of displayed"
+      - "Fixed process hanging after session close"
+      - "Fixed character loss at terminal screen boundary"
     breaking: []
 
   - version: "2.1.38"

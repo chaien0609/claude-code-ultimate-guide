@@ -35,10 +35,18 @@ tags: [reference, release]
 
 ### v2.1.41 (2026-02-13)
 
+- **New**: Guard against launching Claude Code inside another Claude Code session
 - **New**: `claude auth login`, `claude auth status`, `claude auth logout` CLI subcommands
 - **New**: Windows ARM64 (win32-arm64) native binary support
+- Added `speed` attribute to OTel events and trace spans for fast mode visibility
 - **Improved**: `/rename` auto-generates session name from conversation context when called without arguments
 - Improved narrow terminal layout for prompt footer
+- Fixed: Agent Teams using wrong model identifier for Bedrock, Vertex, and Foundry customers
+- Fixed: Crash when MCP tools return image content during streaming
+- Fixed: `/resume` session previews showing raw XML tags instead of readable command names
+- Fixed: Opus 4.6 launch announcement showing for Bedrock/Vertex/Foundry users
+- Fixed: Hook blocking errors (exit code 2) not showing stderr to the user
+- Fixed: Structured-outputs beta header sent unconditionally on Vertex/Bedrock
 - Fixed: File resolution for @-mentions with anchor fragments (e.g., `@README.md#installation`)
 - Fixed: FileReadTool blocking on FIFOs, `/dev/stdin`, and large files
 - Fixed: Background task notifications not delivered in streaming Agent SDK mode
@@ -46,20 +54,15 @@ tags: [reference, release]
 - Fixed: Stale permission rules not clearing when settings change on disk
 - Fixed: Permission wait time included in subagent elapsed time display
 - Fixed: Proactive ticks firing while in plan mode
-
-### v2.1.39 (2026-02-11)
-
-- **New**: Guard against launching Claude Code inside another Claude Code session
-- Added `speed` attribute to OTel events and trace spans for fast mode visibility
-- Fixed: Agent Teams using wrong model identifier for Bedrock, Vertex, and Foundry customers
-- Fixed: Crash when MCP tools return image content during streaming
-- Fixed: `/resume` session previews showing raw XML tags instead of readable command names
-- Fixed: Opus 4.6 launch announcement showing for Bedrock/Vertex/Foundry users
-- Fixed: Hook blocking errors (exit code 2) not showing stderr to the user
-- Fixed: Structured-outputs beta header sent unconditionally on Vertex/Bedrock
 - Improved: Model error messages for Bedrock/Vertex/Foundry with fallback suggestions
+
+### v2.1.39 (2026-02-10)
+
 - Improved: Terminal rendering performance
-- Multiple stability fixes (fatal errors, process hanging, character loss at screen boundary)
+- Fixed: Fatal errors being swallowed instead of displayed
+- Fixed: Process hanging after session close
+- Fixed: Character loss at terminal screen boundary
+- Fixed: Blank lines in verbose transcript view
 
 ### v2.1.38 (2026-02-10)
 

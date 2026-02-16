@@ -260,6 +260,9 @@ claude doctor
 | `claude update` | Check and install updates | Weekly or when encountering issues |
 | `claude doctor` | Verify auto-updater health | After system changes or if updates fail |
 | `claude --version` | Display current version | Before reporting bugs |
+| `claude auth login` | Authenticate from the command line | CI/CD, devcontainers, scripted setups |
+| `claude auth status` | Check current authentication state | Verify which account/method is active |
+| `claude auth logout` | Clear stored credentials | Shared machines, security cleanup |
 
 **Update frequency recommendations:**
 - **Weekly**: Check for updates during normal development
