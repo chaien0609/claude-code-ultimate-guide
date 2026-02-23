@@ -6,6 +6,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **guide/diagrams/09-cost-and-optimization.md + guide/ultimate-guide.md §2.5** — Budget modifier for model selection decision flow
+  - Le diagramme "Model Selection Decision Flow" assumait implicitement un budget illimité (Max/API) — angle mort signalé par la communauté
+  - Ajout d'un **Budget modifier table** : Max/API → Opus plan + Sonnet impl ; Pro/Teams Standard → Sonnet plan + Haiku impl (tâches mécaniques)
+  - Community pattern documenté : *Sonnet pour Plan → Haiku pour Implementation* sur Teams Standard $25/mo
+  - ASCII version mise à jour avec le budget modifier
+  - Note ajoutée dans la Decision Table §2.5 pour le même modifier
+  - Source : feedback Frédéric Camblor (communauté)
+
+- **guide/ultimate-guide.md — §2.7 Configuration Decision Guide** (new section, ~73 lignes)
+  - Vue unifiée "quel mécanisme pour quoi ?" pour les 7 mécanismes de configuration (CLAUDE.md, rules, commands, hooks, agents, skills, MCP)
+  - **Semantic Roles table** — mapping conceptuel rôle → mécanisme en 6 lignes
+  - **Mechanism Comparison table** — 7 mécanismes avec timing de chargement, usage optimal, coût tokens, fiabilité
+  - **Decision Tree** — arbre binaire couvrant tous les 7 mécanismes par ordre de priorité
+  - **56% Reliability Warning** — stat Gao 2026 + implications pratiques + safe pattern CLAUDE.md/skill
+  - **Common Mistakes table** — 4 anti-patterns fréquents avec corrections
+  - Sections 2.7→2.11 renumérotées (Structured Prompting, Semantic Anchors, Data Flow, Under the Hood)
+  - TOC, quick-jump bar, et 3 backlinks (§2.6, §3.4, §5.1) mis à jour
+  - `reference.yaml` : 4 nouvelles entrées avec ancres et line numbers
+
+### Research
+
+- **Resource Evaluation: fp.dev** (score 2/5 — watchlist)
+  - fp.dev = agent-native issue tracker local-first pour Claude Code (issues en `.md` git-committables, skills `/fp-plan` `/fp-implement` `/fp-review`, diff viewer)
+  - Différentiateur réel vs Tasks API : issues committables dans le repo. Mais adoption insuffisante + Apple Silicon only + redondance partielle avec Tasks API native
+  - Fichier : `docs/resource-evaluations/2026-02-22-fp-dev-issue-tracker.md`
+  - **Known Gap ajouté** dans `guide/third-party-tools.md` : "Agent-native issue tracking (markdown-based, git-committable)"
+  - **Watch List** : re-évaluer quand GitHub stars visibles + release cadence + write-up praticien prod
+
 ## [3.28.1] - 2026-02-22 (security patch)
 
 ### Security

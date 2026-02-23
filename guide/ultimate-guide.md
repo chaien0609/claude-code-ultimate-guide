@@ -124,10 +124,11 @@ Context full → /compact or /clear
   - [2.4 Rewind](#24-rewind)
   - [2.5 Model Selection & Thinking Guide](#25-model-selection--thinking-guide)
   - [2.6 Mental Model](#26-mental-model)
-  - [2.7 Structured Prompting with XML Tags](#27-structured-prompting-with-xml-tags)
-  - [2.8 Semantic Anchors](#28-semantic-anchors)
-  - [2.9 Data Flow & Privacy](#29-data-flow--privacy)
-  - [2.10 Under the Hood](#210-under-the-hood)
+  - [2.7 Configuration Decision Guide](#27-configuration-decision-guide)
+  - [2.8 Structured Prompting with XML Tags](#28-structured-prompting-with-xml-tags)
+  - [2.9 Semantic Anchors](#29-semantic-anchors)
+  - [2.10 Data Flow & Privacy](#210-data-flow--privacy)
+  - [2.11 Under the Hood](#211-under-the-hood)
 - [3. Memory & Settings](#3-memory--settings)
   - [3.1 Memory Files (CLAUDE.md)](#31-memory-files-claudemd)
   - [3.2 The .claude/ Folder Structure](#32-the-claude-folder-structure)
@@ -1314,7 +1315,7 @@ Before your next session, verify:
 
 # 2. Core Concepts
 
-_Quick jump:_ [The Interaction Loop](#21-the-interaction-loop) · [Context Management](#22-context-management) · [Plan Mode](#23-plan-mode) · [Rewind](#24-rewind) · [Model Selection](#25-model-selection--thinking-guide) · [Mental Model](#26-mental-model) · [Data Flow & Privacy](#29-data-flow--privacy)
+_Quick jump:_ [The Interaction Loop](#21-the-interaction-loop) · [Context Management](#22-context-management) · [Plan Mode](#23-plan-mode) · [Rewind](#24-rewind) · [Model Selection](#25-model-selection--thinking-guide) · [Mental Model](#26-mental-model) · [Config Decision Guide](#27-configuration-decision-guide) · [Data Flow & Privacy](#210-data-flow--privacy)
 
 ---
 
@@ -2655,6 +2656,8 @@ _Quick jump:_ [Decision Table](#decision-table) · [Effort Levels](#effort-level
 | Multi-agent orchestration | Sonnet + Haiku | mixed | variable |
 
 > **Note on costs**: Estimates based on API pricing (Haiku $0.25/$1.25 per MTok, Sonnet $3/$15, Opus $15/$75). Pro/Max subscribers pay a flat rate — prioritize quality over cost. Opus activates thinking by default. Toggle: `Alt+T`. See [Section 2.2](#cost-awareness--optimization) for full pricing breakdown.
+>
+> **Budget modifier** (Teams Standard/Pro): downgrade one tier per phase — use Sonnet where the table says Opus, Haiku where it says Sonnet for mechanical implementation tasks. Community pattern: *Sonnet for Plan → Haiku for Implementation* on a $25/mo Teams Standard plan.
 
 ---
 
@@ -2782,7 +2785,7 @@ Understanding how Claude Code "thinks" makes you more effective.
 3. **Your Intent**: Claude needs clear instructions
 4. **Hidden Files**: Claude respects .gitignore by default
 
-> **⚠️ Pattern Amplification**: Claude mirrors the patterns it finds. In well-structured codebases, it produces consistent, idiomatic code. In messy codebases without clear abstractions, it perpetuates the mess. If your code lacks good patterns, provide them explicitly in CLAUDE.md or use semantic anchors (Section 2.8).
+> **⚠️ Pattern Amplification**: Claude mirrors the patterns it finds. In well-structured codebases, it produces consistent, idiomatic code. In messy codebases without clear abstractions, it perpetuates the mess. If your code lacks good patterns, provide them explicitly in CLAUDE.md or use semantic anchors (Section 2.9).
 
 ### You Are the Main Thread
 
@@ -2851,7 +2854,7 @@ These are not independent features. They are layers of the same system:
 
 The shift is not about prompting better. It is about building a system where Claude starts every session already knowing what you need.
 
-> **See also**: [§9.10 Continuous Improvement Mindset](#910-continuous-improvement-mindset) for evolving this system over time.
+> **See also**: [§9.10 Continuous Improvement Mindset](#910-continuous-improvement-mindset) for evolving this system over time. Ready to choose the right mechanism? [§2.7 Configuration Decision Guide](#27-configuration-decision-guide) maps all seven mechanisms with a decision tree.
 
 ### Communicating Effectively
 
@@ -2868,7 +2871,80 @@ Login is broken
 
 The more context you provide, the better Claude can help.
 
-## 2.7 Structured Prompting with XML Tags
+## 2.7 Configuration Decision Guide
+
+Seven configuration mechanisms power Claude Code — knowing *which one to reach for* saves hours of trial-and-error. This guide gives you the mental shortcuts.
+
+> **Detailed coverage**: [§3 Memory & Settings](#3-memory--settings) · [§4 Agents](#4-agents) · [§5 Skills](#5-skills) · [§6 Commands](#6-commands) · [§7 Hooks](#7-hooks) · [§8 MCP Servers](#8-mcp-servers)
+
+### Semantic Roles
+
+| Role | Mechanism | One-liner |
+|------|-----------|-----------|
+| What Claude **always knows** | CLAUDE.md + `rules/*.md` | Permanent context, loaded every session |
+| How Claude **executes workflows** | Commands (`.claude/commands/`) | Step-by-step SOPs invoked on demand |
+| What Claude **can't bypass** | Hooks (`.claude/hooks/`) | Automatic guardrails, zero token cost |
+| What Claude **delegates** | Agents (`.claude/agents/`) | Isolated parallel workers with scoped context |
+| Shared **domain knowledge** | Skills (`.claude/skills/`) | Reusable modules inherited by agents |
+| **External system access** | MCP Servers | APIs, databases, tools via protocol |
+
+### Mechanism Comparison
+
+| Mechanism | When Loaded | Best For | Token Cost | Reliability |
+|-----------|-------------|----------|------------|-------------|
+| **CLAUDE.md** | Every session | Core conventions, identity | Always paid | 100% |
+| **rules/*.md** | Every session | Supplementary standing rules | Always paid | 100% |
+| **Commands** | On invocation | Repeatable multi-step workflows | Low (template) | 100% when invoked |
+| **Hooks** | On events | Guardrails, automation, enforcement | Zero | 100% (shell scripts) |
+| **Agents** | On spawn | Isolated / parallel analysis | High (full context) | 100% when spawned |
+| **Skills** | On invocation | Domain knowledge for agents | Medium | ~56% auto-invocation |
+| **MCP Servers** | Session start | External APIs and tools | Connection overhead | 100% when connected |
+
+### Decision Tree: Which Mechanism?
+
+```
+Is this needed every session, for every task?
+├─ Yes → CLAUDE.md (core) or rules/*.md (supplementary)
+│
+└─ No → Should it trigger automatically without user action?
+         ├─ Yes → HOOK (event-driven, shell script)
+         │
+         └─ No → Does it need external system access (API, DB, tool)?
+                  ├─ Yes → MCP SERVER
+                  │
+                  └─ No → Is it a repeatable workflow with defined steps?
+                           ├─ Yes → COMMAND (.claude/commands/)
+                           │
+                           └─ No → Does it need isolated context or parallel work?
+                                    ├─ Yes → AGENT (.claude/agents/)
+                                    │
+                                    └─ No → Is it shared knowledge for multiple agents?
+                                             ├─ Yes → SKILL (.claude/skills/)
+                                             │
+                                             └─ No → Add to CLAUDE.md
+```
+
+### The 56% Reliability Warning
+
+Skills are invoked **on demand** — and agents don't always invoke them. One evaluation found agents triggered skills in only 56% of cases ([Gao, 2026](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals)).
+
+**Practical implications**:
+- Never put *critical* instructions only in skills — they may be silently skipped
+- Safe pattern: CLAUDE.md states **what** (always loaded), skill provides **how in detail** (on demand)
+- For agent workflows, prefer explicit skill invocation in agent frontmatter's `skills:` field
+
+> **See also**: [§3.4 Precedence Rules](#34-precedence-rules) for load order and [§5.1 Understanding Skills](#51-understanding-skills) for the full skills decision tree.
+
+### Common Mistakes
+
+| Mistake | Why It Fails | Fix |
+|---------|-------------|-----|
+| Critical rules only in skills | 44% chance of being skipped | Move to CLAUDE.md or rules/*.md |
+| Everything in CLAUDE.md | Context window bloat every session | Split: permanent → CLAUDE.md, workflows → commands |
+| Hooks for complex logic | Hooks are shell scripts, not Claude | Use hooks for enforcement, commands for multi-step workflows |
+| MCP for simple file ops | Unnecessary overhead | Use built-in file tools; MCP for external systems |
+
+## 2.8 Structured Prompting with XML Tags
 
 XML-structured prompts provide **semantic organization** for complex requests, helping Claude distinguish between different aspects of your task for clearer understanding and better results.
 
@@ -3321,7 +3397,7 @@ cat claudedocs/templates/code-review.xml | \
 
 > **Source**: [DeepTo Claude Code Guide - XML-Structured Prompts](https://cc.deeptoai.com/docs/en/best-practices/claude-code-comprehensive-guide)
 
-### 2.7.1 Prompting as Provocation
+### 2.8.1 Prompting as Provocation
 
 The Claude Code team internally treats prompts as **challenges to a peer**, not instructions to an assistant. This subtle shift produces higher-quality outputs because it forces Claude to prove its reasoning rather than simply comply.
 
@@ -3355,7 +3431,7 @@ This forces a substantive second attempt with accumulated context rather than in
 
 > **Source**: [10 Tips from Inside the Claude Code Team](https://paddo.dev/blog/claude-code-team-tips/) (Boris Cherny thread, Feb 2026)
 
-## 2.8 Semantic Anchors
+## 2.9 Semantic Anchors
 
 LLMs are statistical pattern matchers trained on massive text corpora. Using **precise technical vocabulary** helps Claude activate the right patterns in its training data, leading to higher-quality outputs.
 
@@ -3396,7 +3472,7 @@ Follow these patterns:
 
 ### Combining with XML Tags
 
-Semantic anchors work powerfully with XML-structured prompts (Section 2.7):
+Semantic anchors work powerfully with XML-structured prompts (Section 2.8):
 
 ```xml
 <instruction>
@@ -3448,7 +3524,7 @@ Semantic anchors work powerfully with XML-structured prompts (Section 2.7):
 
 > **Source**: Concept by Alexandre Soyer. Original catalog: [github.com/LLM-Coding/Semantic-Anchors](https://github.com/LLM-Coding/Semantic-Anchors) (Apache-2.0)
 
-## 2.9 Data Flow & Privacy
+## 2.10 Data Flow & Privacy
 
 > **Important**: Everything you share with Claude Code is sent to Anthropic servers. Understanding this data flow is critical for protecting sensitive information.
 
@@ -3504,7 +3580,7 @@ When you use Claude Code, the following data leaves your machine:
 
 > **Full guide**: For complete privacy documentation including known risks, community incidents, and enterprise considerations, see [Data Privacy & Retention Guide](./data-privacy.md).
 
-## 2.10 Under the Hood
+## 2.11 Under the Hood
 
 > **Reading time**: 5 minutes
 > **Goal**: Understand the core architecture that powers Claude Code
@@ -5000,7 +5076,7 @@ Understanding when each memory method loads is critical for token optimization:
 
 **Key insight**: `.claude/rules/` is NOT on-demand. Every `.md` file in that directory loads at session start, consuming tokens. Reserve it for always-relevant conventions, not rarely-used guidelines. Skills are invocation-only and may not be triggered reliably—one eval found agents invoked skills in only 56% of cases ([Gao, 2026](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals)). Never rely on skills for critical instructions; use CLAUDE.md or rules instead.
 
-> **See also**: [Token Cost Estimation](#token-saving-techniques) for approximate token costs per file size.
+> **See also**: [Token Cost Estimation](#token-saving-techniques) for approximate token costs per file size. For a unified "which mechanism for what?" reference, see [§2.7 Configuration Decision Guide](#27-configuration-decision-guide).
 
 ### Path-Specific Rules (December 2025)
 
@@ -6039,6 +6115,8 @@ Is this a repeatable workflow with steps?
                 │
                 └─ No → Just write it in CLAUDE.md as instructions
 ```
+
+> **See also**: [§2.7 Configuration Decision Guide](#27-configuration-decision-guide) for a broader decision tree covering all seven mechanisms (including Hooks, MCP, and CLAUDE.md vs rules).
 
 #### Common Patterns
 

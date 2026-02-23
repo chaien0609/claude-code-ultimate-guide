@@ -14,6 +14,8 @@ How to get maximum value from Claude Code while controlling token consumption an
 
 Not all tasks need the most powerful model. Using the right model for the right task cuts costs by 5-10x without sacrificing quality.
 
+> **This diagram assumes an unconstrained budget (Max/API).** On tighter plans (Pro, Teams Standard), apply the budget modifier below.
+
 ```mermaid
 flowchart TD
     A([Task to complete]) --> B{Task complexity?}
@@ -54,6 +56,16 @@ flowchart TD
     click J href "https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/ultimate-guide.md#25-model-selection--thinking-guide" "Large but clear tasks"
 ```
 
+**Budget modifier** — On constrained plans, downgrade one tier per phase:
+
+| Plan | Planning phase | Implementation phase |
+|------|---------------|---------------------|
+| **Max / API unconstrained** | Opus | Sonnet |
+| **Pro / Teams Standard** | Sonnet | Haiku (mechanical tasks) |
+| **API tight budget** | Sonnet | Haiku |
+
+> *Community pattern (Teams Standard $25/mo): Sonnet for Plan → Haiku for Implementation. Same quality output on mechanical tasks at a fraction of the cost.*
+
 <details>
 <summary>ASCII version</summary>
 
@@ -64,6 +76,10 @@ Task complexity?
 └─ Complex (architecture, sec.)
    ├─ Needs deep reasoning?        → Opus 4.6      ($$$ — most capable)
    └─ Just large/clear?            → Sonnet 4.6    ($$ — handles it)
+
+Budget modifier (downgrade one tier on constrained plans):
+  Max/API    → Opus plan, Sonnet impl
+  Pro/Teams  → Sonnet plan, Haiku impl (mechanical tasks)
 ```
 
 </details>
