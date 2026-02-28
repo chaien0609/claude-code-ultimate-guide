@@ -1277,7 +1277,37 @@ rules:
 ecosystem:
   this_guide:
     focus: "Education - Learn & master"
-    unique: ["architecture docs", "TDD/SDD methodologies", "264-question quiz", "YAML index"]
+    unique: ["architecture docs", "TDD/SDD methodologies", "264-question quiz", "YAML index", "MCP server"]
+  mcp_server:
+    npm: "claude-code-ultimate-guide-mcp"
+    install: "npx -y claude-code-ultimate-guide-mcp"
+    guide_section: "guide/ultimate-guide.md:10602"
+    readme: "mcp-server/README.md"
+    tools:
+      - "search_guide(query, limit?) — search 882 indexed entries"
+      - "read_section(path, offset?, limit?) — read any guide file paginated"
+      - "list_topics() — browse 25 topic categories"
+      - "get_example(name) — fetch production templates"
+      - "list_examples(category?) — agents/commands/hooks/skills/scripts"
+      - "search_examples(query, limit?) — semantic search across all templates by intent"
+      - "get_changelog(count?) — last N guide CHANGELOG entries"
+      - "get_digest(period) — day/week/month combined digest"
+      - "get_release(version?) — Claude Code CLI releases"
+      - "compare_versions(from, to?) — diff two CC versions: aggregated highlights + breaking changes"
+      - "get_cheatsheet(section?) — cheatsheet full or filtered"
+      - "get_threat(id) — look up CVE or attack technique from threat database"
+      - "list_threats(category?) — browse threat-db: global summary or section list"
+    resources:
+      - "claude-code-guide://reference — 94KB YAML index (~900 entries)"
+      - "claude-code-guide://releases — CC releases history"
+      - "claude-code-guide://llms — llms.txt"
+    prompt: "claude-code-expert — activates expert mode with optimal search workflow"
+    slash_commands:
+      location: "~/.claude/commands/ccguide/"
+      commands: ["/ccguide:search", "/ccguide:cheatsheet", "/ccguide:digest", "/ccguide:example", "/ccguide:examples", "/ccguide:release", "/ccguide:changelog", "/ccguide:topics"]
+    agent: ".claude/agents/claude-code-guide.md — Haiku, read-only, searches before answering"
+    bundle_size: "132KB compressed (YAML indexes bundled, markdown lazy-fetched)"
+    cache: "~/.cache/claude-code-guide/{version}/ — 24h TTL"
   complementary:
     claude_code_templates:
       url: "github.com/davila7/claude-code-templates"

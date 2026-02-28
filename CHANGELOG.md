@@ -36,6 +36,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **MCP Server v1.0.3 — content path bug** (`mcp-server/src/lib/content.ts`)
+  - ENOENT au démarrage en production : `CONTENT_DIR` résolvait `../../content` depuis `dist/` (2 niveaux), atterrissant dans `node_modules/` au lieu de la racine du package
+  - Fix : `../content` (1 niveau) — tsup bundle tout à plat dans `dist/`, donc 1 seul niveau suffit
+  - Publié sur npm : `claude-code-ultimate-guide-mcp@1.0.3`
+
 - **Bug ligne 5646 `guide/ultimate-guide.md`** — champs frontmatter agents `skills`, `background`, `isolation`, `memory` étaient incorrectement étiquetés "community patterns / not official spec". Remplacés par table officielle complète vérifiée contre `code.claude.com/docs/en/sub-agents`. Champs concernés : `model`, `tools`, `disallowedTools`, `permissionMode`, `maxTurns`, `skills`, `mcpServers`, `hooks`, `memory`, `background`, `isolation`, `color` — tous officiels.
 
 ### Changed
