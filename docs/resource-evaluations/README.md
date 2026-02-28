@@ -68,6 +68,7 @@ Les documents de travail bruts (prompts Perplexity, audits clients) restent dans
 | **Snyk ToxicSkills** (Supply Chain Audit) | 4/5 | **4/5** | ✅ Intégré (security-hardening.md §1.1, §1.2, §1.5) | [snyk-toxicskills-evaluation.md](./snyk-toxicskills-evaluation.md) |
 | **System Prompts Opus 4.6** (Official Update) | 2/5 | **2/5** | ⚠️ Watch only (2nd eval, same URL, already covered) | [system-prompts-opus-4-6-update.md](./system-prompts-opus-4-6-update.md) |
 | **qmd Token Savings** (Simone Ruggiero, Medium) | 2/5 | **2/5** | ❌ Ne pas intégrer (redundant avec grepai, claims non vérifiables) | [2026-02-14-simone-ruggiero-qmd-token-savings-medium.md](./2026-02-14-simone-ruggiero-qmd-token-savings-medium.md) |
+| **Rippletide** (AI Reliability Platform) | 2/5 | **2/5** | ⚠️ Watch only (MCP server tiers, claims non vérifiables, pas de traction) | [072-rippletide-ai-reliability-platform.md](./072-rippletide-ai-reliability-platform.md) |
 
 ## Watch List
 
@@ -75,4 +76,4 @@ Ressources surveillées mais pas encore intégrées : [watch-list.md](./watch-li
 
 ---
 
-**Dernier update**: 2026-02-14 (60 évaluations)
+**Dernier update**: 2026-02-28 (72 évaluations)

@@ -10599,6 +10599,89 @@ retrieve_memory("work in progress?")
 
 ---
 
+### 📖 This Guide as an MCP Server
+
+The Claude Code Ultimate Guide ships its own MCP server — `claude-code-ultimate-guide-mcp` — so you can query the guide directly from any Claude Code session without cloning the repo.
+
+**What it gives you**: 9 tools covering search, content reading, templates, digests, cheatsheet, and release notes. The structured index (882 entries) is bundled in the package (~130KB); markdown files are fetched from GitHub on demand with 24h local cache.
+
+#### Installation
+
+Add to `~/.claude.json`:
+
+```json
+{
+  "mcpServers": {
+    "claude-code-guide": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "claude-code-ultimate-guide-mcp"]
+    }
+  }
+}
+```
+
+Or with a local clone (dev mode — reads files directly from disk):
+
+```json
+{
+  "mcpServers": {
+    "claude-code-guide": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/path/to/claude-code-ultimate-guide/mcp-server/dist/index.js"],
+      "env": {
+        "GUIDE_ROOT": "/path/to/claude-code-ultimate-guide"
+      }
+    }
+  }
+}
+```
+
+#### Available tools
+
+| Tool | Signature | Description |
+|------|-----------|-------------|
+| `search_guide` | `(query, limit?)` | Search 882 indexed entries by keyword or question |
+| `read_section` | `(path, offset?, limit?)` | Read any guide file with pagination (500 lines max) |
+| `list_topics` | `()` | Browse all 25 topic categories |
+| `get_example` | `(name)` | Fetch a production-ready template by name |
+| `list_examples` | `(category?)` | List all templates — `agents`, `commands`, `hooks`, `skills`, `scripts` |
+| `get_changelog` | `(count?)` | Last N guide CHANGELOG entries (default 5) |
+| `get_digest` | `(period)` | Combined digest of guide + CC releases: `day`, `week`, `month` |
+| `get_release` | `(version?)` | Claude Code CLI release details |
+| `get_cheatsheet` | `(section?)` | Full cheatsheet or filtered by section |
+
+**Resources**: `claude-code-guide://reference` (full 94KB YAML index), `claude-code-guide://releases`, `claude-code-guide://llms`
+
+**Prompt**: `claude-code-expert` — activates expert mode with optimal search workflow
+
+#### Slash command shortcuts
+
+Install the companion slash commands for one-keystroke access (stored in `~/.claude/commands/ccguide/`):
+
+```bash
+# These commands are included in the guide repo under .claude/commands/ccguide/
+# Copy or symlink to ~/.claude/commands/ccguide/ to install globally
+```
+
+| Command | Example | Description |
+|---------|---------|-------------|
+| `/ccguide:search` | `/ccguide:search hooks` | Search by keyword |
+| `/ccguide:cheatsheet` | `/ccguide:cheatsheet hooks` | Cheatsheet (full or section) |
+| `/ccguide:digest` | `/ccguide:digest week` | What changed this week |
+| `/ccguide:example` | `/ccguide:example code-reviewer` | Fetch a template |
+| `/ccguide:examples` | `/ccguide:examples agents` | List templates by category |
+| `/ccguide:release` | `/ccguide:release 2.1.59` | Release details |
+| `/ccguide:changelog` | `/ccguide:changelog 10` | Recent guide CHANGELOG |
+| `/ccguide:topics` | `/ccguide:topics` | Browse all categories |
+
+#### Custom agent
+
+A `claude-code-guide` agent is included in `.claude/agents/claude-code-guide.md`. It uses Haiku (fast, cheap) and automatically searches the guide before answering any Claude Code question.
+
+---
+
 ### 🌐 Community MCP Servers Ecosystem
 
 Beyond the official servers listed above, the MCP ecosystem includes **validated community servers** that extend Claude Code's capabilities with specialized integrations.

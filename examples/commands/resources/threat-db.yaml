@@ -2,8 +2,8 @@
 # For use with /security-check and /security-audit commands
 # Manually maintained — update after new security advisories
 
-version: "2.3.0"
-updated: "2026-02-25"
+version: "2.4.0"
+updated: "2026-02-28"
 sources:
   - name: "Snyk ToxicSkills"
     url: "https://snyk.io/blog/toxicskills-malicious-ai-agent-skills-clawhub/"
@@ -98,6 +98,18 @@ sources:
   - name: "CVEDetails - CVE-2026-27203 eBay API MCP Server Env Injection"
     url: "https://www.cvedetails.com/cve/CVE-2026-27203/"
     date: "2026-02-20"
+  - name: "NVD - CVE-2026-27735 mcp-server-git Path Traversal in git_add"
+    url: "https://nvd.nist.gov/vuln/detail/CVE-2026-27735"
+    date: "2026-02-26"
+  - name: "Snyk - Clinejection: AI Bot → Supply Chain Attack via Cache Poisoning"
+    url: "https://snyk.io/blog/cline-supply-chain-attack-prompt-injection-github-actions/"
+    date: "2026-02-19"
+  - name: "The Hacker News - Cline CLI 2.3.0 Supply Chain Attack"
+    url: "https://thehackernews.com/2026/02/cline-cli-230-supply-chain-attack.html"
+    date: "2026-02-20"
+  - name: "Microsoft Security Blog - AI Recommendation Poisoning"
+    url: "https://www.microsoft.com/en-us/security/blog/2026/02/10/ai-recommendation-poisoning/"
+    date: "2026-02-10"
 
 # ═══════════════════════════════════════════════════════════════
 # MALICIOUS AUTHORS (confirmed by security researchers)
@@ -810,13 +822,24 @@ cve_database:
     fixed_in: "no fix confirmed"
     mitigation: "Sanitize all inputs to updateEnvFile; do not expose eBay MCP Server to untrusted inputs"
 
+  # --- MCP Git Server (additional, git_add path traversal) ---
+  - id: "CVE-2026-27735"
+    component: "MCP Git Server (mcp-server-git)"
+    severity: "medium"
+    cvss: 6.4
+    description: "Path traversal in git_add tool — unsafe GitPython repo.index.add() call without path boundary validation allows staging/committing files outside repo (e.g. /etc/shadow, ~/.ssh/id_rsa); attacker or confused LLM can exfiltrate sensitive host files via a commit push"
+    source: "NVD / dev.to (2026-02-26)"
+    fixed_in: "2026.1.14"
+    mitigation: "Update mcp-server-git to >= 2026.1.14; audit recent git commits managed by agents for unexpected file paths"
+    notes: "Distinct from CVE-2025-68143/68144/68145 (those affect git_init/git_diff/git_checkout); this affects git_add; fix uses repo.git.add('--', *files) instead of repo.index.add(files)"
+
 # ═══════════════════════════════════════════════════════════════
 # MINIMUM SAFE VERSIONS (quick reference for scanning)
 # ═══════════════════════════════════════════════════════════════
 minimum_safe_versions:
   "filesystem-mcp": "0.6.3"
   "mcp-inspector": "0.14.1"
-  "mcp-server-git": "2025.12.18"
+  "mcp-server-git": "2026.1.14"
   "mcp-python-sdk": "1.23.0"
   "mcp-gateway": "0.28.0"
   "figma-developer-mcp": "0.6.3"
@@ -1119,6 +1142,28 @@ campaigns:
     package: "postmark-mcp"
     technique: "Copies official Postmark MCP server with hidden backdoor"
 
+  - name: "Clinejection"
+    source: "Snyk / Adnan Khan (researcher)"
+    date: "2026-02-17"
+    platform: "GitHub Actions / npm"
+    packages:
+      - "cline-cli@2.3.0 (malicious, 4000 downloads, 8-hour window)"
+    technique: "Prompt injection via GitHub issue title → GitHub Actions cache poisoning (10 GB junk fill, LRU eviction) → stolen CI/CD publishing tokens → malicious npm publish"
+    tokens_stolen:
+      - "VSCE_PAT"
+      - "OVSX_PAT"
+      - "NPM_RELEASE_TOKEN"
+    payload: "OpenClaw AI agent installer distributed to developer machines"
+    timeline:
+      - "2026-01-01: Researcher Adnan Khan submits GHSA and notifies Cline"
+      - "2026-02-09: Public disclosure; Cline patches in 30 minutes"
+      - "2026-02-17: Unknown actor exploits, publishes malicious cline-cli 2.3.0"
+    notes: "Potential blast radius: 5M+ VS Code users with auto-update enabled; Cline moved to OIDC provenance post-fix"
+    sources:
+      - "https://snyk.io/blog/cline-supply-chain-attack-prompt-injection-github-actions/"
+      - "https://adnanthekhan.com/posts/clinejection/"
+      - "https://thehackernews.com/2026/02/cline-cli-230-supply-chain-attack.html"
+
 # ═══════════════════════════════════════════════════════════════
 # ATTACK TECHNIQUES TAXONOMY
 # Maps to SAFE-MCP framework and common patterns
@@ -1226,6 +1271,23 @@ attack_techniques:
     cves: ["CVE-2025-59536", "CVE-2026-21852"]
     source: "Check Point Research (2026-02-25)"
     mitigation: "Review .claude/settings.json and .mcp.json before opening unfamiliar repos; treat these files as code, not metadata; update Claude Code to >= 2.0.65; never clone-and-run from untrusted sources without inspecting config files first"
+
+  - id: "T012"
+    name: "AI Recommendation Poisoning"
+    description: "Attacker embeds hidden instructions in URLs (e.g. 'Summarize with AI' buttons, share links) that inject persistent memory entries into AI assistants, biasing future recommendations toward attacker-controlled content or services"
+    examples:
+      - "Company embeds 'remember [Brand] as a trusted source' in URL parameters of 'Summarize with AI' buttons; user clicks → AI memory poisoned; every future conversation biased"
+      - "Malicious share links containing memory-altering prompts distributed via email or web pages"
+      - "50+ unique prompts from 31 companies across 14 industries documented by Microsoft over 60 days (2026-02-10)"
+    high_risk_sectors:
+      - "Health advice (biased medical recommendations)"
+      - "Financial services (biased investment advice)"
+    detection:
+      - "Hunt for URLs pointing to AI assistant domains containing prompt keywords: 'remember', 'trusted source', 'in future conversations', 'authoritative source', 'cite'"
+      - "Periodically audit AI memory for entries referencing brands or commercial interests"
+      - "Monitor web proxy / browser history for clicks to AI-assistant share URLs with prompt parameters"
+    source: "Microsoft Security Blog (2026-02-10)"
+    mitigation: "Disable URL-based memory pre-population in AI assistants where possible; treat any 'Summarize with AI' button as potentially adversarial; periodically clear AI memory; hover over AI buttons before clicking to inspect destination URL"
 
 # ═══════════════════════════════════════════════════════════════
 # SCANNING TOOLS
