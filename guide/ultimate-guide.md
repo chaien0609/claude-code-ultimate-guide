@@ -16,7 +16,7 @@ tags: [guide, reference, workflows, agents, hooks, mcp, security]
 
 **Last updated**: January 2026
 
-**Version**: 3.29.1
+**Version**: 3.29.2
 
 ---
 
@@ -4667,7 +4667,7 @@ The `.claude/` folder is your project's Claude Code directory for memory, settin
 | Personal preferences | `CLAUDE.md` | ❌ Gitignore |
 | Personal permissions | `settings.local.json` | ❌ Gitignore |
 
-### 3.29.1 Version Control & Backup
+### 3.29.2 Version Control & Backup
 
 **Problem**: Without version control, losing your Claude Code configuration means hours of manual reconfiguration across agents, skills, hooks, and MCP servers.
 
@@ -7369,9 +7369,32 @@ npx add-skill anthropics/claude-plugins-official  # CLAUDE.md auditor + automati
 
 Full catalog: [skills.sh leaderboard](https://skills.sh/)
 
+#### Security Audits (February 2026)
+
+Vercel launched automated security scanning on every skills.sh skill ([announcement, Feb 17, 2026](https://vercel.com/changelog/automated-security-audits-now-available-for-skills-sh)), partnering with three independent security firms covering 60,000+ skills:
+
+| Partner | Method | Performance |
+|---------|--------|-------------|
+| **Socket** | Cross-ecosystem static analysis + LLM-based noise reduction (curl\|sh, obfuscation, exfiltration, suspicious deps) | 95% precision, 97% F1 |
+| **Snyk** | `mcp-scan` engine: LLM judges + deterministic rules, detects "toxic flows" between natural language and executable code | 90-100% recall, 0% false positives on legit skills |
+| **Gen (Agent Trust Hub)** | Real-time monitoring of connections in/out of agents to prevent data exfiltration and prompt injection | Continuous |
+
+**Risk levels** displayed on every skill page and shown before installation via `skills@1.4.0+`:
+
+| Rating | Meaning |
+|--------|---------|
+| ✅ Safe | Verified against security best practices |
+| 🟡 Low Risk | Minor risk indicators detected |
+| 🔴 High Risk | Significant security concerns |
+| ☠️ Critical | Severe or malicious behavior — hidden from search |
+
+**Continuous monitoring**: skills are re-evaluated as detection improves. If a repository becomes malicious after install, its rating updates automatically.
+
+> **Mental model**: treat a skill like a Docker image — it's an executable dependency, not a prompt. Verify the rating before installing in production.
+
 #### Status & Trade-offs
 
-**Status**: Very recent (launched Jan 21, 2026), rapid adoption but early stage
+**Status**: Launched Jan 21, 2026, security-audited since Feb 17, 2026 (Socket + Snyk + Gen)
 
 **Governance**: Community project by Vercel Labs (not official Anthropic). Skills contributed by Vercel, Anthropic, Supabase, and community members.
 
@@ -7379,8 +7402,9 @@ Full catalog: [skills.sh leaderboard](https://skills.sh/)
 - ✅ Centralized discovery + leaderboard (200+ skills)
 - ✅ One-command install (vs manual GitHub clone)
 - ✅ Format 100% compatible with this guide
+- ✅ Automated 3-layer security audit before installation
+- ✅ Continuous monitoring post-install
 - ⚠️ Multi-agent focus (not Claude Code specific)
-- ⚠️ Early stage (maturity to prove over time)
 - ⚠️ Skills require explicit invocation; agents only auto-invoke them ~56% of the time ([Gao, 2026](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals)). For critical instructions, prefer always-loaded CLAUDE.md
 
 #### When to Use
@@ -7421,6 +7445,9 @@ cp -r /tmp/agent-skills/react-best-practices .claude/skills/
 #### References
 
 - [Vercel Changelog: Introducing Agent Skills](https://vercel.com/changelog/introducing-skills-the-open-agent-skills-ecosystem)
+- [Vercel Changelog: Automated security audits for skills.sh](https://vercel.com/changelog/automated-security-audits-now-available-for-skills-sh)
+- [Snyk Blog: Securing the Agent Skill Ecosystem](https://snyk.io/blog/snyk-vercel-securing-agent-skill-ecosystem/)
+- [Gen + Vercel: Agent Trust Hub partnership](https://www.prnewswire.com/news-releases/gen-and-vercel-partner-to-bring-independent-safety-verification-to-the-ai-skills-ecosystem-302691006.html)
 - [GitHub: vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills)
 - [Platform Claude Docs: Skill Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
 - See also: [AI Ecosystem Guide](./ai-ecosystem.md) for complementary tools
@@ -7455,6 +7482,8 @@ Slash commands are shortcuts for common workflows.
 | `/status` | Show session info |
 | `/plan` | Enter Plan Mode |
 | `/rewind` | Undo changes |
+| `/simplify` | Review changed code and fix over-engineering |
+| `/batch` | Process multiple items efficiently |
 | `/insights` | Generate usage analytics report |
 | `/exit` | Exit Claude Code |
 
@@ -7705,6 +7734,53 @@ EOF
 | Git history | Code changes only | Commit log | Delivery metrics, PR velocity |
 
 > **Tip**: Run `/insights` monthly, `/status` per session, and `ccboard` weekly for comprehensive visibility.
+
+### The /simplify Command
+
+Added in v2.1.63, `/simplify` is a bundled slash command that reviews your recently changed code for over-engineering and redundant abstractions, then fixes the problems it finds.
+
+#### When to Use It
+
+Run it after finishing a feature, before opening a pull request:
+
+```bash
+# Review everything changed since last commit
+/simplify
+
+# Focus on a specific concern
+/simplify focus on error handling
+/simplify check for unnecessary dependencies
+/simplify look at the database query patterns
+```
+
+#### What It Does
+
+`/simplify` analyzes changed code for:
+- **Reuse** — duplicated logic that could be extracted
+- **Quality** — patterns that reduce readability or maintainability
+- **Efficiency** — algorithmic and structural improvements
+
+It operates at the architecture and structure level, not at the formatter or linter level. `/simplify` complements tools like ESLint or Prettier rather than replacing them.
+
+#### Positioning
+
+| Tool | Level | Fixes |
+|------|-------|-------|
+| Prettier | Formatting | Style, whitespace |
+| ESLint | Syntax rules | Simple patterns, unused vars |
+| `/simplify` | Architecture | Over-abstraction, duplication, design |
+
+> **Note**: `/simplify` is a bundled slash command (ships with Claude Code), not a custom skill you need to create. Available from v2.1.63+.
+
+### The /batch Command
+
+Also added in v2.1.63, `/batch` is a bundled slash command for processing multiple items efficiently in a single invocation.
+
+```bash
+/batch
+```
+
+> **Note**: Both `/simplify` and `/batch` are bundled slash commands that ship with Claude Code v2.1.63+. No configuration required.
 
 ### Custom Commands
 
@@ -21820,4 +21896,4 @@ We'll evaluate and add it to this section if it meets quality criteria.
 
 **Contributions**: Issues and PRs welcome.
 
-**Last updated**: January 2026 | **Version**: 3.29.1
+**Last updated**: January 2026 | **Version**: 3.29.2

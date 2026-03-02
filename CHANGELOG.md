@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+- **skills.sh security audits** (`guide/ultimate-guide.md` §Skills Marketplace) — nouvelle sous-section "Security Audits (February 2026)" : 3 partenaires indépendants (Socket analyse statique 97% F1, Snyk mcp-scan 0% faux positifs, Gen Agent Trust Hub monitoring continu), 4 niveaux de risque (Safe/Low/High/Critical), monitoring post-install, mental model "skill = dépendance exécutable". Trade-offs mis à jour : suppression warning "Early stage", ajout ✅ audits automatisés + monitoring continu. 3 références sources ajoutées (Vercel changelog, Snyk blog, Gen/PRNewswire). Source : [Vercel, 17 fév 2026](https://vercel.com/changelog/automated-security-audits-now-available-for-skills-sh).
+
+## [3.29.2] - 2026-03-02
+
+### Added
+- **`/simplify` command documentation** (`guide/ultimate-guide.md` §6.1) — section dédiée pour la commande bundlée v2.1.63 : description officielle (over-engineering, redundant abstractions), 3 dimensions analysées (reuse/quality/efficiency), exemples d'usage ciblé (`/simplify focus on error handling`), table de positionnement vs linters/formatters.
+- **`/batch` command documentation** (`guide/ultimate-guide.md` §6.1) — section dédiée pour la commande bundlée v2.1.63 : traitement de plusieurs éléments en une invocation.
+- **Table Built-in Commands mise à jour** — `/simplify` et `/batch` ajoutés §6.1 et §1.3. Sources : release notes GitHub officiel + Perplexity.
+
 ## [3.29.1] - 2026-03-02
 
 ### Added
