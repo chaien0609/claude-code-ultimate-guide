@@ -27,7 +27,7 @@ This repository provides everything needed to go from Claude Code beginner to po
 
 ### Customization
 - **Agents**: Custom AI personas with specific tools and instructions
-- **Skills**: Reusable knowledge modules for complex domains
+- **Skills**: Reusable knowledge modules — two types: Capability Uplift (fills model gaps, fades as model improves) and Encoded Preference (encodes team workflows, stays durable). Skills 2.0 adds Evals (Benchmark Mode, A/B testing, Trigger Tuning) and a lifecycle/retirement framework (March 2026)
 - **Commands**: Custom slash commands for frequent workflows
 - **Hooks**: Event-driven automation (PreToolUse, PostToolUse, UserPromptSubmit)
 

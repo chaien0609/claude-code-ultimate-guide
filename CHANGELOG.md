@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [3.31.0] - 2026-03-06
+
+### Added
+
+- **Skills 2.0 — Taxonomie, Evals et Lifecycle** (`guide/ultimate-guide.md` §5.0, §5.X, §5.Y) — 3 nouveaux blocs : taxonomie Capability Uplift vs Encoded Preference, Skill Lifecycle (Catch Regressions + Spot Outgrowth + retirement checklist), Skill Evals (Benchmark Mode / A/B Testing / Trigger Tuning). Tableau "What Makes a Good Skill?" enrichi (colonne Expected Lifespan). `guide/cheatsheet.md` + `machine-readable/llms.txt` mis à jour. 3 nouvelles questions quiz landing (019-021). Sources : ainews.com, mexc.co, claudecode.jp — mars 2026.
+
+- **Featured Community Plugins — Vitals + SE-CoVe** (`guide/ultimate-guide.md` §8.5) — Vitals (chopratejas/vitals, v0.1 alpha) : détection hotspots par formule `git churn × structural complexity × coupling centrality`, diagnostic sémantique Claude, zéro dépendances. SE-CoVe (vertti/se-cove-claude-plugin, v1.1.1) : pipeline Chain-of-Verification 5 étapes (Baseline → Planner → Executor → Synthesizer → Output), vérificateur sans accès à la solution initiale. Évaluation : `docs/resource-evaluations/vitals-codebase-health-plugin.md` (3/5). Entrées `machine-readable/reference.yaml` mises à jour.
+
+### Documentation
+
+- **Memory system — 3 corrections** (`guide/ultimate-guide.md`) : Auto-Memories version corrigée (v2.1.32+ → v2.1.59+, confirmé 2026-02-26), context thresholds unifiés (<70% optimal / 75% auto-compact / 85% handoff / 95% force), WHAT/WHY/HOW framework ajouté (§3.1 Minimum Viable CLAUDE.md) avec exemple Next.js et anti-pattern "ne pas auto-générer son CLAUDE.md".
+
 ## [3.30.2] - 2026-03-05
 
 ### Documentation
