@@ -735,6 +735,23 @@ git-ai init
    - Mandatory human-only review for security-critical?
    - Approval workflow for AI-heavy PRs?
 
+### Evidence Collection for Auditors
+
+When SOC2, ISO27001, or HIPAA auditors ask for evidence of AI code governance, here's what to provide and where to find it:
+
+| Auditor request | Evidence source | How to generate |
+|-----------------|----------------|-----------------|
+| "Show your AI usage policy" | `docs/ai-usage-charter.md` | See [charter template](../../examples/scripts/ai-usage-charter-template.md) |
+| "Show access controls for AI tools" | `.claude/settings.json` (permissions.deny) | Committed to each project repo |
+| "Show third-party AI component vetting" | `.claude/mcp-registry.yaml` | See [registry template](../../examples/scripts/mcp-registry-template.yaml) |
+| "Show audit log of AI actions" | `~/.claude/projects/**/*.jsonl` | Native session logs |
+| "Show code review process for AI code" | PR descriptions with AI disclosure | PR template + attribution policy |
+| "Show how AI incidents are handled" | Incident response runbook | Add AI section to existing IR docs |
+
+**Practical tip**: Run `./scripts/claude-governance-audit.sh` (see [enterprise-governance.md §5.3](../security/enterprise-governance.md#53-compliance-checking)) before each audit to verify controls are in place and generate a baseline report.
+
+**For session-level audit trails** with full context (prompts, reasoning, tool calls, diffs), Entire CLI creates cryptographically-linked checkpoints in Git. This is one approach among several — evaluate based on your retention requirements and team size. See [§5.1 Entire CLI](#51-entire-cli) for setup and evaluation criteria.
+
 ---
 
 ## Templates

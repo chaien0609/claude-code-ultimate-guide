@@ -6,6 +6,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **Enterprise AI Governance section** (`guide/security/enterprise-governance.md`) — New guide covering org-level governance for teams deploying Claude Code at scale. 6 sections: (1) Local vs Shared governance split (risk matrix, decision framework); (2) AI Usage Charter — lean template covering approved tools, data classification, use case boundaries, approval matrix; (3) MCP Governance Workflow — approval pipeline (request → review → approve → deploy), YAML registry format, enforcement hook; (4) Guardrail Tiers — 4 pre-configured tiers (Starter/Standard/Strict/Regulated) with ready-to-copy `settings.json` and `CLAUDE.md` additions; (5) Policy Enforcement at Scale — config distribution, onboarding checklist, compliance audit script, role-based guardrails, CI/CD gates; (6) Audit & Compliance — what SOC2/ISO27001 auditors actually ask, audit trail setup, AI Governance Committee minimal structure. Audience: tech leads, engineering managers, security officers. Complements security-hardening.md (individual dev security) and production-safety.md (6 prod rules).
+
+- **MCP Registry Template** (`examples/scripts/mcp-registry-template.yaml`) — Ready-to-use YAML format for tracking approved MCP servers at org level. Includes approved/pending/denied sections, version bump policy, risk classification (LOW/MEDIUM/HIGH), data scope classification (PUBLIC/INTERNAL/CONFIDENTIAL/RESTRICTED), and expiry dates.
+
+- **Governance Enforcement Hook** (`examples/hooks/bash/governance-enforcement-hook.sh`) — SessionStart hook validating active MCP configuration against org's approved registry, checking deny rules for secret files, and detecting dangerous `permissions.allow` overrides. Warns without blocking (governance-first, not friction-first).
+
+- **AI Usage Charter Template** (`examples/scripts/ai-usage-charter-template.md`) — Org-level charter template covering approved tools, data classification (4 levels), approved/prohibited use cases, MCP server governance, code review and attribution requirements, accountability roles, incident response, and compliance mapping (SOC2/ISO27001/HIPAA/PCI DSS/GDPR).
+
+### Documentation
+
+- **`guide/roles/adoption-approaches.md`** — Added "Enterprise Rollout (50+ developers)" section with 3-phase rollout approach (Foundation/Adoption/Optimization), common rollout mistakes at scale, and pointer to enterprise-governance.md for compliance programs.
+
+- **`guide/ops/observability.md`** — Added "Manager Audit Checklist" section with weekly spot-check bash queries (files accessed outside project scope, destructive commands run) and a monthly compliance report script.
+
+- **`guide/ops/ai-traceability.md`** — Added "Evidence Collection for Auditors" subsection under §7.3 Enterprise/Compliance — practical table mapping auditor questions to evidence sources and generation commands.
+
+- **`guide/security/production-safety.md`** — Added cross-reference to enterprise-governance.md in See Also section.
+
+- **`guide/security/security-hardening.md`** — Added cross-reference to enterprise-governance.md with explicit scope boundary ("this guide = individual MCP vetting; that guide = org-level policy"), plus MCP registry template reference.
+
+- **`guide/README.md`** — Added enterprise-governance.md entry in Security section.
+
+- **`machine-readable/reference.yaml`** — Added 22 entries for enterprise governance guide, templates, and hooks.
+
 ### Changed
 
 - **GEO/SEO optimization — llms.txt, llms-full.txt, guide meta descriptions** — Phase 1 (repo): `machine-readable/llms.txt` updated (v3.8.0→3.32.2, 87→238 templates, 9.6K→22.7K lines); `llms.txt` created at repo root (convention llmstxt.org — AI crawlers expect root); `llms-full.txt` created (~20KB: full cheatsheet, 238-template catalog, 10 Q&A FAQ); `mcp-server/content/llms.txt` synced. Phase 2 (landing): `public/llms.txt` synced, `public/llms-full.txt` created; stale root `robots.txt` (wrong sitemap URL, missing 6 AI bots) and `sitemap.xml` (6 URLs only) deleted — `public/` versions are canonical. Phase 3 (landing): JSON-LD counts fixed (113→238 in `examples/index.astro`, description sync in `index.astro`); `twitter:site` + `twitter:creator` added to `Layout.astro`; CVE stat 19→24 in security page; `lastmod` added to all sitemap entries in `astro.config.mjs`. Phase 4 (README): invisible HTML keyword comment replaced with visible 5 Q&A mini-FAQ (GEO crawlers + humans). Phase 5 (guide section): 13 `CHAPTERS` descriptions rewritten in `scripts/prepare-guide-content.mjs` (source of truth for Starlight frontmatter) — avg 40→150 chars, now include specific agent names, hook event types, MCP server names, pattern names.

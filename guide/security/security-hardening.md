@@ -855,12 +855,14 @@ Beyond securing Claude Code itself, Anthropic offers a dedicated vulnerability s
 
 ## See Also
 
+- [Enterprise AI Governance](./enterprise-governance.md) — Org-level MCP governance (approval workflow, registry, guardrail tiers). This guide covers individual MCP vetting; that guide covers org-level policy.
 - [Data Privacy Guide](./data-privacy.md) — Retention policies, compliance, what data leaves your machine
 - [AI Traceability](../ops/ai-traceability.md) — PromptPwnd vulnerability, CI/CD security, attribution policies
 - [Security Checklist Skill](../examples/skills/security-checklist.md) — OWASP Top 10 patterns for code review
 - [Security Auditor Agent](../examples/agents/security-auditor.md) — Automated vulnerability detection (read-only)
 - [Security Patcher Agent](../examples/agents/security-patcher.md) — Applies patches from audit findings (human approval required)
 - [Security Gate Hook](../examples/hooks/bash/security-gate.sh) — Blocks vulnerable code patterns at write time (7 patterns)
+- [MCP Registry Template](../../examples/scripts/mcp-registry-template.yaml) — YAML format for tracking approved MCPs at org level
 - [Ultimate Guide §7.4](./ultimate-guide.md#74-security-hooks) — Hook system basics
 - [Ultimate Guide §8.6](./ultimate-guide.md#86-mcp-security) — MCP security overview
 

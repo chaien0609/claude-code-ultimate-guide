@@ -284,6 +284,41 @@ These are starting points, not rules. Team dynamics matter more than headcount.
 
 > **Emerging approach**: Some organizations explore "corporate AI marketplaces" to pool AI skills, agents, and rules at the organizational level rather than individual teams (Hugo/Writizzy 2026[^hugo2026]). Few documented production implementations yet, but the concept addresses governance at scale.
 
+### Enterprise Rollout (50+ developers or regulated environments)
+
+At this scale, individual team setups are not enough. You need a shared config baseline that applies consistently across all projects.
+
+**Phased rollout approach:**
+
+**Phase 1 — Foundation (Week 1–2)**: Establish the governance baseline.
+- Create org-level shared config repo (`.claude/` templates per tier)
+- Publish AI Usage Charter (see [charter template](../../examples/scripts/ai-usage-charter-template.md))
+- Start MCP registry with currently-used MCPs (even if just 3 entries)
+- Install global safety hooks on all developer machines via onboarding script
+
+**Phase 2 — Adoption (Week 3–6)**: Roll out project configs.
+- Classify existing projects by tier (Starter / Standard / Strict / Regulated)
+- Bootstrap each project with the appropriate tier config via setup script
+- Add Claude Code onboarding to engineering onboarding checklist
+- Run first governance audit to baseline the current state
+
+**Phase 3 — Optimization (Month 2–3)**: Refine based on friction.
+- Review hook false positive rate — tune rules that block legitimate work
+- Identify MCP requests and process them through registry workflow
+- Add CI/CD governance gates to catch config drift
+- Conduct first quarterly MCP registry review
+
+**Common rollout mistakes at this scale:**
+
+| Mistake | Effect | Fix |
+|---------|--------|-----|
+| Rolling out Strict tier everywhere on day 1 | Developer resistance, workarounds | Start with Standard, move critical projects to Strict |
+| No central config repo | Every team diverges within weeks | Platform team owns shared templates |
+| Governance checks that block work | Developers disable hooks | Warn-only hooks, fix the root cause |
+| No onboarding → charter ignored | Policy exists on paper only | 30-min onboarding session per team |
+
+**For formal compliance programs** (SOC2, ISO27001, HIPAA), the additional requirements around audit trails, data classification, and review cycles are covered in [Enterprise AI Governance](../security/enterprise-governance.md).
+
 [^hugo2026]: Hugo, ["AI's Impact on State of the Art in Software Engineering in 2026"](https://eventuallymaking.io/p/ai-s-impact-on-the-state-of-the-art-in-software-engineering-in-2026), Feb 6, 2026. Based on interviews with Doctolib, Malt, Alan, Google Cloud, Brevo, ManoMano, Ilek, Clever Cloud engineering teams.
 
 ---

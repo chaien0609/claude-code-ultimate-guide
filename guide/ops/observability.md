@@ -916,11 +916,70 @@ find ~/.claude/logs -name "*.jsonl" -mtime +30 -delete
 
 ---
 
+---
+
+## Manager Audit Checklist
+
+For engineering managers and team leads who need to verify Claude Code is being used appropriately within their team, these are the practical audit queries.
+
+### Weekly Spot Check (5 minutes)
+
+```bash
+# Did anything unusual happen this week?
+
+# 1. Files accessed outside project scope
+find ~/.claude/projects/ -name "*.jsonl" -newer "$(date -d '7 days ago' +%Y-%m-%d 2>/dev/null || date -v-7d +%Y-%m-%d)" 2>/dev/null | \
+  xargs jq -r 'select(.type == "assistant") |
+    .message.content[]? |
+    select(.type == "tool_use" and .name == "Read") |
+    .input.file_path' 2>/dev/null | \
+  grep -v "^$(pwd)" | sort -u
+
+# 2. Destructive commands run
+find ~/.claude/projects/ -name "*.jsonl" -newer "$(date -d '7 days ago' +%Y-%m-%d 2>/dev/null || date -v-7d +%Y-%m-%d)" 2>/dev/null | \
+  xargs jq -r 'select(.type == "assistant") |
+    .message.content[]? |
+    select(.type == "tool_use" and .name == "Bash") |
+    .input.command' 2>/dev/null | \
+  grep -iE "(drop|delete|truncate|rm -rf|git push --force)"
+```
+
+### Compliance Reporting
+
+For regulated environments, generate a summary of AI activity for auditors:
+
+```bash
+#!/bin/bash
+# Monthly compliance report for Claude Code activity
+
+START_DATE=${1:-$(date -d '30 days ago' +%Y-%m-%d 2>/dev/null || date -v-30d +%Y-%m-%d)}
+END_DATE=${2:-$(date +%Y-%m-%d)}
+REPORT_FILE="ai-activity-report-${START_DATE}-${END_DATE}.json"
+
+echo "Generating compliance report: $START_DATE to $END_DATE"
+
+# Count sessions, tool calls, and file accesses
+jq -s '{
+  report_period: {start: "'"$START_DATE"'", end: "'"$END_DATE"'"},
+  tool_usage: (group_by(.tool) | map({tool: .[0].tool, count: length})),
+  unique_files_accessed: ([.[].file] | unique | length),
+  sessions: ([.[].session_id] | unique | length)
+}' ~/.claude/logs/activity-*.jsonl 2>/dev/null > "$REPORT_FILE" || \
+  echo "No activity logs found. Set up session-logger.sh hook to enable."
+
+echo "Report saved: $REPORT_FILE"
+```
+
+For a full governance setup with automatic audit trail logging, see [Enterprise AI Governance §6.2](../security/enterprise-governance.md#62-audit-trail-setup).
+
+---
+
 ## Related Resources
 
 - [Session Search Script](../examples/scripts/session-search.sh) - Fast session search & resume
 - [Session Logger Hook](../examples/hooks/bash/session-logger.sh)
 - [Stats Analysis Script](../examples/scripts/session-stats.sh)
+- [Enterprise AI Governance](../security/enterprise-governance.md) - Org-level governance, audit trails, compliance
 - [Third-Party Tools](../ecosystem/third-party-tools.md) - Community GUIs, TUIs, and dashboards (ccusage, ccburn, claude-code-viewer)
 - [Data Privacy Guide](../security/data-privacy.md) - What data leaves your machine
 - [Cost Optimization](./ultimate-guide.md#cost-optimization) - Tips to reduce spend
