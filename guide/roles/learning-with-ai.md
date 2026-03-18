@@ -28,11 +28,12 @@ tags: [guide, workflows]
 8. [Embracing AI Tools (Pattern: Avoidant)](#embracing-ai-tools)
 9. [Optimizing Your Flow (Pattern: Augmented)](#optimizing-your-flow)
 10. [Case Study: Hybrid Learning Principles](#case-study-hybrid-learning-principles)
-11. [30-Day Progression Plan](#30-day-progression-plan)
-12. [For Tech Leads & Engineering Managers](#for-tech-leads--engineering-managers)
-13. [Red Flags Checklist](#red-flags-checklist)
-14. [Sources & Research](#sources--research)
-15. [See Also](#see-also)
+11. [Where Are You on the Agent Adoption Curve?](#where-are-you-on-the-agent-adoption-curve)
+12. [30-Day Progression Plan](#30-day-progression-plan)
+13. [For Tech Leads & Engineering Managers](#for-tech-leads--engineering-managers)
+14. [Red Flags Checklist](#red-flags-checklist)
+15. [Sources & Research](#sources--research)
+16. [See Also](#see-also)
 
 ---
 
@@ -816,6 +817,35 @@ You probably don't have a dedicated tutor, but you can create the structure:
 | Progress tracking | Learning journal, skill assessment |
 
 The combination of **human accountability + AI practice** beats either alone. This mirrors [what research shows about successful teams](#why-some-teams-get-results-and-others-dont): clear guidelines, code review standards, and mentorship structures.
+
+---
+
+## Where Are You on the Agent Adoption Curve?
+
+> **Audience**: Developers already using Claude Code who want to gauge their current sophistication — not beginners starting from scratch (use the 30-Day Plan below for that).
+
+Before picking a learning path, locate yourself. Nicolas Martignole (Principal Engineer at Back Market) proposed a 6-level maturity scale in March 2026 that maps well onto practical Claude Code usage. The levels below are adapted from his framework, with the upper half (3-5) being where most of this guide's content lives.
+
+| Level | Profile | Signal |
+|-------|---------|--------|
+| **0** | Never used AI dev tools | Using chatbots at most, nothing integrated in workflow |
+| **1** | Editor autocomplete | Cursor, Copilot, Windsurf — but no agent-level usage |
+| **2** | External LLM, copy-paste | ChatGPT or Claude in browser, pasting code manually into editor |
+| **3** | Claude Code basic user | Running Plan mode, simple prompts, reviewing everything manually |
+| **4** | Stage delegator | Handing off full development stages (research, architecture, implementation, tests) — writing less than 10% of code manually |
+| **5** | Context engineer | Designing CLAUDE.md, sub-agents, custom skills, MCP servers — building the environment for agents to operate in |
+| **6** | Orchestrator | Coordinating agent graphs, reinforcement loops, distributed agent systems |
+
+**Quick self-placement questions:**
+
+- Can you leave Claude Code running on a feature branch for 20+ minutes without checking in? → Level 4+
+- Do you write CLAUDE.md before starting a project, not after? → Level 5
+- Have you built a custom agent or hook in the last month? → Level 5-6
+- Is your primary output prompts and system design, not code? → Level 6
+
+If you landed at Level 3 or below: the 30-Day Plan below is the right path. If you're at Level 4-6: skip to [Context Engineering](../core/context-engineering.md), [Agent Patterns](../../examples/agents/), or [MCP Ecosystem](../ecosystem/mcp-servers-ecosystem.md).
+
+> Source: Nicolas Martignole, ["Découvrir les niveaux de maturité de l'adoption des coding agents"](https://www.touilleur-express.fr/2026/03/17/decouvrir-les-niveaux-de-maturite-de-ladoption-des-coding-agents), Le Touilleur Express, March 2026. Adapted and extended.
 
 ---
 

@@ -6,9 +6,9 @@
 
 <p align="center">
   <a href="https://github.com/FlorianBruniaux/claude-code-ultimate-guide/stargazers"><img src="https://img.shields.io/github/stars/FlorianBruniaux/claude-code-ultimate-guide?style=for-the-badge" alt="Stars"/></a>
-  <a href="./CHANGELOG.md"><img src="https://img.shields.io/badge/Updated-Mar_17,_2026_·_v3.37.0-brightgreen?style=for-the-badge" alt="Last Update"/></a>
+  <a href="./CHANGELOG.md"><img src="https://img.shields.io/badge/Updated-Mar_18,_2026_·_v3.37.1-brightgreen?style=for-the-badge" alt="Last Update"/></a>
   <a href="./quiz/"><img src="https://img.shields.io/badge/Quiz-271_questions-orange?style=for-the-badge" alt="Quiz"/></a>
-  <a href="./examples/"><img src="https://img.shields.io/badge/Templates-204-green?style=for-the-badge" alt="Templates"/></a>
+  <a href="./examples/"><img src="https://img.shields.io/badge/Templates-217-green?style=for-the-badge" alt="Templates"/></a>
   <a href="./guide/security/security-hardening.md"><img src="https://img.shields.io/badge/🛡️_Threat_DB-15_vulnerabilities_·_655_malicious_skills-red?style=for-the-badge" alt="Threat Database"/></a>
   <a href="./mcp-server/"><img src="https://img.shields.io/badge/MCP_Server-npx_ready-blueviolet?style=for-the-badge" alt="MCP Server"/></a>
 </p>
@@ -66,7 +66,7 @@ Both guides serve different needs. Choose based on your priority.
 | **Security hardening** | Only threat database (24 CVEs) | Basic patterns only |
 | **Test understanding** | 271-question quiz | Not available |
 | **Methodologies** (TDD/SDD/BDD) | Full workflow guides | Not covered |
-| **Copy-paste ready** templates | 218 templates | 200+ templates |
+| **Copy-paste ready** templates | 217 templates | 200+ templates |
 
 ### Ecosystem Positioning
 
@@ -75,7 +75,7 @@ Both guides serve different needs. Choose based on your priority.
                            ▲
                            │
                            │  ★ This Guide
-                           │  Security + Methodologies + 22K lines
+                           │  Security + Methodologies + 23K+ lines
                            │
                            │  [Everything-You-Need-to-Know]
                            │  SDLC/BMAD beginner
@@ -92,7 +92,7 @@ Both guides serve different needs. Choose based on your priority.
 **4 unique gaps no competitor covers:**
 1. **Security-First** — 24 CVEs + 655 malicious skills tracked (no competitor has this depth)
 2. **Methodology Workflows** — TDD/SDD/BDD comparison + step-by-step guides
-3. **Comprehensive Reference** — 22K lines across 16 specialized guides (24× more reference material than everything-cc)
+3. **Comprehensive Reference** — 23K+ lines across 16 specialized guides (24× more reference material than everything-cc)
 4. **Educational Progression** — 271-question quiz, beginner → expert path
 
 **Recommended workflow:**
@@ -150,7 +150,7 @@ claude "Use the claude-code-guide MCP server. Activate the claude-code-expert pr
 graph LR
     root[📦 Repository<br/>Root]
 
-    root --> guide[📖 guide/<br/>22K lines]
+    root --> guide[📖 guide/<br/>23K+ lines]
     root --> examples[📋 examples/<br/>218 templates]
     root --> quiz[🧠 quiz/<br/>271 questions]
     root --> tools[🔧 tools/<br/>utils]
@@ -240,7 +240,7 @@ graph LR
 
 [Browse all 41 diagrams →](./guide/diagrams/)
 
-**What this means for you**: Understand the master loop before reading 22K lines, see multi-agent topologies at a glance, share visual security threat models with your team.
+**What this means for you**: Understand the master loop before reading 23K+ lines, see multi-agent topologies at a glance, share visual security threat models with your team.
 
 ---
 
@@ -543,31 +543,33 @@ security_gate_hook: "examples/hooks/bash/security-gate.sh" # file path ref
 
 ## 📄 Whitepapers (FR + EN)
 
-A series of 11 focused whitepapers covering Claude Code in depth. Each covers a specific topic and is available in both **French and English**.
+11 focused whitepapers covering Claude Code in depth — PDF + EPUB, available in French and English. 472 pages total.
 
 > **Coming soon** — currently in private access. Public release planned.
 
-- **00** — *De Zéro à Productif / From Zero to Productive* — Foundations, first steps
-- **01** — *Prompts qui Marchent / Prompts That Work* — Prompting method, context, hooks
-- **02** — *Personnaliser Claude / Customizing Claude* — CLAUDE.md, custom agents, skills
-- **03** — *Sécurité en Production / Security in Production* — 17 security hooks, threat DB, permissions
-- **04** — *L'Architecture Démystifiée / Architecture Demystified* — Agent loop, context, token pricing
-- **05** — *Déployer en Équipe / Team Deployment* — CI/CD, observability, 50+ devs adoption
-- **06** — *Privacy & Compliance* — Anthropic data, ZDR, retention policies
-- **07** — *Guide de Référence / Reference Guide* — Complete synthesis + advanced workflows
-- **08** — *Agent Teams* — Multi-agent orchestration and coordination
-- **09** — *Apprendre avec l'IA / Learning with AI* — UVAL protocol, comprehension debt, 30-day plan
-- **10** — *Budget IA / AI Budget* — Token costs, model selection, cost optimization
+| # | FR | EN | Pages |
+|---|----|----|-------|
+| **00** | *De Zéro à Productif* | *From Zero to Productive* | 20 |
+| **01** | *Prompts qui Marchent* | *Prompts That Work* | 40 |
+| **02** | *Personnaliser Claude* | *Customizing Claude* | 47 |
+| **03** | *Sécurité en Production* | *Security in Production* | 48 |
+| **04** | *L'Architecture Démystifiée* | *Architecture Demystified* | 40 |
+| **05** | *Déployer en Équipe* | *Team Deployment* | 43 |
+| **06** | *Privacy & Compliance* | *Privacy & Compliance* | 29 |
+| **07** | *Guide de Référence* | *Reference Guide* | 87 |
+| **08** | *Agent Teams* | *Agent Teams* | 42 |
+| **09** | *Apprendre avec l'IA* | *Learning with AI* — UVAL protocol, comprehension debt | 49 |
+| **10** | *Convaincre son Employeur* | *Making the Case for AI* — ROI dossier for CEO/CTO/CFO | 27 |
 
-## 🗂️ Recap Cards (FR + EN)
+## 🗂️ Recap Cards (FR, EN coming)
 
-57 single-page A4 reference cards — printable, one concept per card. Organized in 3 series:
+57 single-page A4 reference cards — printable, one concept per card. Available in French; English version in progress.
 
-> **Coming soon** — currently in private access. Public release planned alongside the whitepapers. Available in French and English.
+> **Browse online**: [cc.bruniaux.com/cheatsheets/](https://cc.bruniaux.com/cheatsheets/)
 
 - **Technique (22 cards)** — Commands, permissions, configuration, MCP, models, context window
-- **Méthodologie / Methodology (22 cards)** — Daily workflow, agents, hooks, CI/CD, multi-agent, debug
-- **Conception / Design (13 cards)** — Mental models, prompting, security by design, cost patterns
+- **Méthodologie (22 cards)** — Daily workflow, agents, hooks, CI/CD, multi-agent, debug
+- **Conception (13 cards)** — Mental models, prompting, security by design, cost patterns
 
 ---
 
@@ -729,7 +731,7 @@ Use this guide critically. Experiment. Share what works for you.
 
 | File | Purpose | Time |
 |------|---------|------|
-| **[Ultimate Guide](./guide/ultimate-guide.md)** | Complete reference (20K+ lines), 10 sections | 30-40h (full) • Most consult sections |
+| **[Ultimate Guide](./guide/ultimate-guide.md)** | Complete reference (23K+ lines), 10 sections | 30-40h (full) • Most consult sections |
 | **[Cheat Sheet](./guide/cheatsheet.md)** | 1-page printable reference | 5 min |
 | **[Visual Reference](./guide/core/visual-reference.md)** | 20 ASCII diagrams for key concepts | 5 min |
 | **[Architecture](./guide/core/architecture.md)** | How Claude Code works internally | 25 min |
@@ -872,7 +874,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
 ---
 
-*Version 3.37.0 | Updated daily · Mar 17, 2026 | Crafted with Claude*
+*Version 3.37.1 | Updated daily · Mar 18, 2026 | Crafted with Claude*
 
 <!-- SEO Keywords -->
 <!-- claude code, claude code tutorial, anthropic cli, ai coding assistant, claude code mcp,

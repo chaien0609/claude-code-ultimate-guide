@@ -50,3 +50,4 @@ mcp-server/node_modules/
 
 # Vitals provenance data
 .vitals/
+.worktrees/

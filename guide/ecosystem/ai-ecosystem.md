@@ -2107,11 +2107,11 @@ For developers hitting Claude Code's subscription limits or needing model flexib
 
 An **on-machine AI coding agent** developed by Block (formerly Square), released under Apache 2.0 license. Unlike Claude Code, Goose runs entirely locally and is **model-agnostic**—it can use Claude, GPT, Gemini, Groq, or any LLM provider.
 
-| Metric | Value (Jan 2026) |
+| Metric | Value (Mar 2026) |
 |--------|------------------|
-| **GitHub Stars** | 15,400+ |
-| **Contributors** | 350+ |
-| **Releases** | 100+ since Jan 2025 |
+| **GitHub Stars** | 33,000+ |
+| **Contributors** | 400+ |
+| **Releases** | 175+ since Jan 2025 |
 | **License** | Apache 2.0 (permissive) |
 | **Primary Language** | Rust (64%) + TypeScript (26%) |
 
@@ -2124,7 +2124,7 @@ An **on-machine AI coding agent** developed by Block (formerly Square), released
 | **Cost Model** | Subscription ($20-$200/mo) | Free + your LLM API costs |
 | **Rate Limits** | Anthropic's weekly/5-hour caps | Your LLM provider's limits |
 | **Token Visibility** | Opaque (no per-prompt tracking) | Full transparency |
-| **MCP Support** | Native (growing ecosystem) | 3,000+ MCP servers available |
+| **MCP Support** | Native (growing ecosystem) | Thousands of MCP servers available |
 | **Setup Complexity** | Simple (npm install) | Moderate (Rust toolchain, API keys) |
 
 ### When to Consider Goose
@@ -2141,6 +2141,14 @@ An **on-machine AI coding agent** developed by Block (formerly Square), released
 - You prefer fixed monthly cost vs. variable API billing
 - You value Claude's specific reasoning capabilities and can't substitute
 - You don't want to manage LLM API credentials
+
+### Recipes: Goose's Equivalent of Skills + Commands
+
+Goose has a workflow primitive called **Recipes** — versionable, shareable, parameterized multi-step workflows. Unlike Claude Code's skills (which define agent capabilities) or slash commands (which trigger one-shot actions), Recipes define complete execution sequences: what to do, in what order, with which model at each step. They can be shared as deeplinks, imported by teammates, and checked into source control. Closest Claude Code analogy: a skill that chains multiple commands in a defined sequence, with state carried between steps.
+
+### Subagent Orchestration
+
+Since mid-2025, Goose supports spawning specialized subagents within a workflow. A parent agent can delegate subtasks to subagents with different roles (Planner, Architect, Frontend Dev, Backend Dev), each potentially running a different LLM optimized for its task. This differs from Claude Code's Agent tool (which spawns a subagent with the same model) — Goose enables heterogeneous agent teams where model choice is per-role, not per-session. See §9 for Claude Code's native multi-agent patterns.
 
 ### Skill Portability
 

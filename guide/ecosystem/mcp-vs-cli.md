@@ -40,7 +40,7 @@ This page compares two integration patterns for giving Claude Code access to ext
 
 | Advantage | Detail |
 |-----------|--------|
-| **Zero context overhead** | No schema injected at startup — relevant when context budget is tight |
+| **Zero context overhead** | No schema injected at startup. Since v2.1.7 lazy loading closes most of the gap, but CLI is still the absolute minimum. |
 | **Deterministic actions** | Explicit commands with predictable output are easier to audit and test |
 | **Human + AI use** | The same CLI wrapper works for a developer running it manually and for Claude |
 | **Frontier models** | Claude Opus/Sonnet 4.6 can drive complex CLIs (aws-cli, glab, gh) without a structured schema |
@@ -52,7 +52,7 @@ This page compares two integration patterns for giving Claude Code access to ext
 
 | Weakness | Detail |
 |----------|--------|
-| **Schema token cost** | Every MCP server injects its full tool list into the context window at session start, whether or not those tools are used that session |
+| **Schema token cost** | Since v2.1.7, lazy loading (MCP Tool Search) means unused tools inject only their name, not their full schema. Cost is still non-zero: tool names load at startup, full schemas load on first use. The pre-v2.1.7 worst case (~55K tokens for a 5-server setup) now averages ~8.7K — an 85% reduction, but not zero. |
 | **Connection overhead** | Session startup takes longer with many MCP servers connected |
 | **Debugging difficulty** | Failures inside an MCP server are harder to trace than a failed shell command |
 | **Maintenance complexity** | Running, updating, and securing remote MCP servers adds infrastructure |
@@ -112,7 +112,7 @@ Quick reference — not rules, but directional defaults.
 | Individual dev, local machine | **CLI or skill** | Simpler, faster, no infrastructure |
 | Deterministic actions (git, CI, deploy) | **CLI** | Explicit commands, predictable output, auditable |
 | Complex auth (OAuth, token refresh) | **MCP** | Server handles auth; CLI would require credential plumbing |
-| Tight context budget / many tools loaded | **CLI** | No schema injection at startup |
+| Tight context budget / many tools loaded | **CLI** | Still the minimum-overhead option. Lazy loading (v2.1.7+) reduces MCP cost significantly, but CLI has zero schema cost by design. |
 | Agent-to-agent structured output | **MCP** | JSON responses are more reliable than parsed CLI text |
 | Debugging / prototyping a new integration | **CLI** | Easier to inspect, faster to iterate |
 | Browser automation (non-frontier model) | **MCP** | Playwright MCP structures interaction reliably |
@@ -138,18 +138,35 @@ The mistake is applying one answer to both layers. A solo developer building a C
 
 ## Token cost of MCP schemas — what the numbers look like
 
-MCP servers inject their full tool list into the context at session start. This is not free.
+Since v2.1.7 (January 2026), Claude Code uses **MCP Tool Search** (lazy loading) by default. This changes the token math significantly, but does not eliminate schema cost entirely.
 
-A typical MCP server with 10-15 tools injects 500-2,000 tokens per session before any task starts. With 5 MCP servers connected, that is 2,500-10,000 tokens of overhead on every session, whether or not those tools are used.
+**How lazy loading works:** instead of injecting all tool schemas at session start, Claude receives only tool names in an `<available-deferred-tools>` block. Full schemas are fetched via `ToolSearch` only when Claude decides to call a specific tool. Unused tools in a session cost only their name in context (~0 schema tokens), not the full definition.
 
-The practical consequence: if you load 10 MCP servers but only use 2 in a given session, you are paying for 8 servers worth of schema every time. This compounds with long sessions and high-frequency workflows.
+**Measured impact** (Anthropic benchmarks, 5-server setup):
 
-**Mitigation strategies:**
+| Scenario | Token overhead | Note |
+|----------|---------------|------|
+| Before v2.1.7 (eager loading) | ~55,000 tokens | All schemas preloaded |
+| After v2.1.7 (lazy loading) | ~8,700 tokens | 85% reduction |
+| CLI (no MCP) | ~0 tokens | Baseline |
+
+The old worst-case claim of "500-2,000 tokens per server" described eager loading, which is no longer the default. With lazy loading, the cost per unused server is near zero. The cost per *used* server (~600 tokens per tool schema loaded on demand) remains real, but is now pay-per-use rather than always-on.
+
+**What still adds overhead even with lazy loading:**
+
+- Tool names are still injected at startup (one line per tool per server)
+- Schemas load at first invocation — long sessions using many tools accumulate cost
+- Connection setup per server is unchanged (latency, not tokens)
+- Many connected MCP servers still means more names in context, even if schemas stay deferred
+
+**Configuration** (v2.1.9+): the `ENABLE_TOOL_SEARCH` environment variable controls the threshold. `auto:N` triggers lazy loading when MCP tools exceed N% of context (default 10%).
+
+**Mitigation strategies** (still relevant, lower urgency):
 
 - Load MCP servers selectively per project (project-level config vs global config)
-- Use CLI tools for high-frequency operations where schema overhead accumulates
-- Monitor token usage per session to identify which MCP schemas are loaded but unused
-- Consider a CLI wrapper for tools you use frequently in tight loops (compile → test → fix cycles)
+- Use CLI tools for high-frequency tight loops where any overhead compounds (compile → test → fix)
+- Monitor token usage per session to identify which schemas are being loaded at invocation time
+- Consider a CLI wrapper for tools you use constantly but don't need structured output from
 
 ---
 

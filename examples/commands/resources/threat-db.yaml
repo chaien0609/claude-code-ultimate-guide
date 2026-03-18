@@ -2,8 +2,8 @@
 # For use with /security-check and /security-audit commands
 # Manually maintained — update after new security advisories
 
-version: "2.7.0"
-updated: "2026-03-13"
+version: "2.8.0"
+updated: "2026-03-18"
 sources:
   - name: "Snyk ToxicSkills"
     url: "https://snyk.io/blog/toxicskills-malicious-ai-agent-skills-clawhub/"
@@ -158,6 +158,24 @@ sources:
   - name: "DryRun Security - AI coding agents introduce vulnerabilities in 87% of PRs"
     url: "https://markets.businessinsider.com/news/stocks/new-dryrun-security-research-anthropic-s-claude-generates-the-most-unresolved-security-flaws-in-ai-built-applications-1035918593"
     date: "2026-03-11"
+  - name: "The Hacker News - GhostClaw npm Package Deploys RAT"
+    url: "https://thehackernews.com/2026/03/malicious-npm-package-posing-as.html"
+    date: "2026-03-09"
+  - name: "Huntress / itbrew - Fake OpenClaw Installer Stealth Packer + GhostSocks"
+    url: "https://www.itbrew.com/stories/2026/03/03/new-vulnerability-in-open-source-repositories-uses-fake-openclaw-install-to-attack"
+    date: "2026-03-03"
+  - name: "Jozu Agent Guard - Zero-Trust AI Runtime"
+    url: "https://www.helpnetsecurity.com/2026/03/17/jozu-agent-guard-targets-ai-agents-that-evade-controls/"
+    date: "2026-03-17"
+  - name: "GitHub Blog - Secret Scanning via GitHub MCP Server (public preview)"
+    url: "https://github.blog/changelog/2026-03-17-secret-scanning-in-ai-coding-agents-via-the-github-mcp-server/"
+    date: "2026-03-17"
+  - name: "SC World - Shadow MCP: The New Security Risk of Unvetted AI Agent Tools"
+    url: "https://www.scworld.com/perspective/mcp-is-the-backdoor-your-zero-trust-architecture-forgot-to-close"
+    date: "2026-03-18"
+  - name: "AdminByRequest - OpenClaw Security Crisis Overview"
+    url: "https://www.adminbyrequest.com/en/blogs/openclaw-went-from-viral-ai-agent-to-security-crisis-in-just-three-weeks"
+    date: "2026-03-09"
 
 # ═══════════════════════════════════════════════════════════════
 # MALICIOUS AUTHORS (confirmed by security researchers)
@@ -541,6 +559,22 @@ malicious_skills:
     source: "Defender's Initiative"
     risk: "critical"
     notes: "Squatter copying official Postmark MCP with hidden backdoor"
+
+  # ─── GhostClaw: Malicious npm package (March 2026) ───
+  - name: "@openclaw-ai/openclawai"
+    type: "supply-chain"
+    platform: "npm"
+    source: "The Hacker News (GhostClaw)"
+    risk: "critical"
+    notes: "GhostLoader RAT — persistent daemon, SOCKS5 proxy, live browser session cloning, clipboard monitor (every 3s for private keys/API keys), steals credentials/SSH keys/Apple Keychain/iMessage; 178 downloads before discovery; uploaded 2026-03-03"
+
+  # ─── ambar-src: Malicious npm developer tool (~50K downloads) ───
+  - name: "ambar-src"
+    type: "supply-chain"
+    platform: "npm"
+    source: "Security research (2026-03)"
+    risk: "critical"
+    notes: "~50,000 downloads; uses evasion techniques to avoid detection; targets developer machines with malware delivery"
 
 # ═══════════════════════════════════════════════════════════════
 # MALICIOUS SKILL PATTERNS (for wildcard/regex matching)
@@ -943,6 +977,16 @@ cve_database:
     mitigation: "Apply Microsoft March 2026 security update; restrict Azure MCP Server endpoints to trusted callers; audit managed identity permissions (principle of least privilege); monitor for unexpected outbound requests from MCP server processes"
     notes: "CWE-918 SSRF; rated 'Exploitation Less Likely' by Microsoft; part of 84-CVE March 2026 Patch Tuesday"
 
+  # --- Bun runtime (npm lifecycle bypass) ---
+  - id: "CVE-2026-24910"
+    component: "Bun runtime (bun.sh)"
+    severity: "high"
+    description: "Malicious npm packages can execute lifecycle scripts (postinstall) without validating source origin — allows supply chain payloads to run during npm install in Bun environments; affects developer machines using Bun as runtime"
+    source: "Security research (2026-03); referenced in Claude Code supply chain risk analysis"
+    fixed_in: "v1.3.5"
+    mitigation: "Update Bun to >= 1.3.5; audit package postinstall hooks before running install; prefer lockfile-verified installs"
+    notes: "Particularly impactful in AI agent/MCP contexts where install-time execution occurs within the platform's operating environment; verify CVE ID via NVD"
+
   # --- Framelink Figma MCP Server (additional CVE) ---
   - id: "CVE-2025-15061"
     component: "Framelink Figma MCP Server (figma-developer-mcp)"
@@ -972,6 +1016,7 @@ minimum_safe_versions:
   "mcp-salesforce-connector": "0.1.10"
   "openclaw": "2026.1.29"
   "azure-mcp-server": "March 2026 Patch Tuesday (2026-03-10)"
+  "bun": "1.3.5"
 
 # ═══════════════════════════════════════════════════════════════
 # IOCs (Indicators of Compromise)
@@ -1287,6 +1332,39 @@ campaigns:
       - "https://adnanthekhan.com/posts/clinejection/"
       - "https://thehackernews.com/2026/02/cline-cli-230-supply-chain-attack.html"
 
+  - name: "GhostClaw"
+    source: "The Hacker News / ProArch (2026-03-09)"
+    date: "2026-03-03"
+    platform: "npm"
+    packages:
+      - "@openclaw-ai/openclawai (178 downloads, removed after discovery)"
+    malware: "GhostLoader RAT"
+    technique: "Malicious npm package posing as official OpenClaw AI installer; postinstall hook triggers GhostLoader; installs persistent RAT with SOCKS5 proxy and live browser session cloning; clipboard monitoring every 3 seconds for crypto addresses, API keys (AWS, OpenAI, Anthropic)"
+    targets:
+      - "System credentials and browser data"
+      - "Crypto wallets"
+      - "SSH keys"
+      - "Apple Keychain databases"
+      - "iMessage history"
+      - "AWS, OpenAI, Anthropic API keys (clipboard monitoring)"
+    sources:
+      - "https://thehackernews.com/2026/03/malicious-npm-package-posing-as.html"
+      - "https://www.proarch.com/blog/threats-vulnerabilities/openclaw-rce-vulnerability-cve-2026-25253"
+
+  - name: "Fake OpenClaw Installer (Stealth Packer + GhostSocks)"
+    source: "Huntress / itbrew (2026-03-03)"
+    date: "2026-03-03"
+    platform: "GitHub repositories"
+    malware: "Stealth Packer + GhostSocks"
+    technique: "Fake OpenClaw installers distributed via malicious GitHub repositories; AI-generated search results (Bing) inadvertently recommended malicious repos to users searching for OpenClaw; installers deploy Stealth Packer malware and GhostSocks which resets firewall protections to route traffic through compromised systems while evading anti-fraud protections and MFA"
+    targets:
+      - "Anti-fraud systems bypass"
+      - "MFA bypass"
+      - "Network traffic routing via compromised host"
+    notes: "Demonstrates convergence of supply-chain attack and AI search result poisoning; attackers made malware look like legitimate OpenClaw installers"
+    sources:
+      - "https://www.itbrew.com/stories/2026/03/03/new-vulnerability-in-open-source-repositories-uses-fake-openclaw-install-to-attack"
+
   - name: "ClawHub Wave 3 / VirusTotal Bypass"
     source: "ReversingLabs / Paul McCarty (OpenSourceMalware)"
     date: "2026-03-10"
@@ -1462,6 +1540,26 @@ attack_techniques:
     campaigns: ["ClawHub Wave 3 / VirusTotal Bypass"]
     source: "ReversingLabs / Paul McCarty (OpenSourceMalware) 2026-03-10"
     mitigation: "Domain verification for all external links in SKILL.md; never follow SKILL.md instructions to external websites; use network egress filtering; check domain registration dates for 'official' skill installer links"
+
+  - id: "T017"
+    name: "Shadow MCP Deployment"
+    description: "Employees deploy MCP servers without IT oversight, giving AI agents access to production systems, databases, and APIs outside any security review or governance process. The MCP server itself may be legitimate but the deployment creates unmonitored attack surface."
+    examples:
+      - "Developer installs an open-source MCP server connecting Claude to production database with admin credentials"
+      - "Team deploys MCP gateway exposing Kubernetes cluster to AI agents without security review"
+      - "Shadow MCP server with broad permissions added to Claude Desktop without IT awareness"
+    source: "SC World / Aquilax AI (2026-03-18)"
+    mitigation: "Implement MCP server allowlists enforced via policy; require IT approval for all MCP server additions; use Qualys TotalAI or similar to detect shadow MCP deployments; audit claude_desktop_config.json and .mcp.json across developer machines"
+
+  - id: "T018"
+    name: "AI Search Result Poisoning for Malware Distribution"
+    description: "Attackers create malicious GitHub repos or websites that rank highly in AI-generated search results (Bing AI, Google AI Overview, ChatGPT search). AI systems recommend the malicious repo as the legitimate source for popular tools. Victims trust the AI recommendation and install malware."
+    examples:
+      - "Fake OpenClaw installer GitHub repos ranked by Bing AI as the official download source; Huntress documented Bing recommending malicious OpenClaw installers to users"
+      - "Malicious npm packages named to match AI hallucination patterns and rank in AI search for missing packages"
+    campaigns: ["Fake OpenClaw Installer (Stealth Packer + GhostSocks)"]
+    source: "Huntress / itbrew (2026-03-03)"
+    mitigation: "Always verify download sources via official project website or GitHub org; do not trust AI-generated search results for download URLs without verification; check repo creation date and star count before downloading; use package manager with lockfiles"
 
   - id: "T015"
     name: "Log Poisoning via WebSocket for Prompt Injection"
@@ -1678,6 +1776,35 @@ scanning_tools:
       - "Code scanning focus — does not scan SKILL.md or agent configurations"
     notes: "Complementary to Anthropic Claude Code Security; launched research preview 2026-03-05"
 
+  - name: "Jozu Agent Guard"
+    vendor: "Jozu"
+    type: "runtime"
+    url: "https://www.helpnetsecurity.com/2026/03/17/jozu-agent-guard-targets-ai-agents-that-evade-controls/"
+    capabilities:
+      - "Zero-trust AI runtime — executes agents, models, and MCP servers in secure environments"
+      - "Non-disableable policy enforcement (guardrails cannot be bypassed by agent reasoning)"
+      - "Artifact verification via tamper-evident attestations (prevents impersonation attacks like Postmark MCP squatter)"
+      - "Tool governance — controls access to individual tool calls within MCP server catalog"
+      - "Re-routing attack prevention (blocks EchoLeak-style attacks that redirect emails/data to attacker-controlled addresses)"
+    limitations:
+      - "Newer product — limited community adoption data"
+      - "Focus on runtime enforcement — does not scan SKILL.md or ClawHub ecosystem"
+    notes: "Launched 2026-03-17; addresses agent autonomy bypass (T013) specifically"
+
+  - name: "MCP Sentinel"
+    vendor: "George Gerchow / Bedrock Data (RSAC 2026)"
+    type: "cli"
+    url: "https://www.youtube.com/watch?v=l00ZoeYhBwg"
+    capabilities:
+      - "Intercepts data movement between clipboard and AI agents"
+      - "Scans requests and tool arguments for partial and transformed sensitive content"
+      - "Blocks unsafe data transfers with local audit trails"
+      - "Works alongside MCP server without modifying agent workflow"
+    limitations:
+      - "Research/demo tool from RSAC 2026 — production readiness unclear"
+      - "Clipboard-focused — does not scan MCP configs or SKILL.md"
+    notes: "Presented at RSAC 2026 (March 2026); demonstrates gateway pattern for sensitive data interception"
+
   - name: "Mend SAST MCP"
     vendor: "Mend.io"
     type: "mcp-server"
@@ -1764,6 +1891,11 @@ defensive_resources:
       prs_with_vulns_pct: 87
       total_issues: 143
       agents_tested: ["Claude Sonnet 4.6", "OpenAI Codex GPT 5.2", "Google Gemini 2.5 Pro"]
+
+  - name: "Jozu Agent Guard Runtime"
+    url: "https://www.helpnetsecurity.com/2026/03/17/jozu-agent-guard-targets-ai-agents-that-evade-controls/"
+    type: "tool"
+    description: "Zero-trust AI runtime launched 2026-03-17. Enforces non-bypassable guardrails on agents, models, and MCP servers with artifact verification and tool-level governance. Directly addresses T013 (Autonomous Safety Control Bypass) and tool re-routing attacks."
 
   - name: "Qualys TotalAI MCP Asset Governance"
     url: "https://blog.qualys.com/product-tech/2026/03/10/from-shadow-models-to-audit-ready-ai-security-a-practical-path-with-qualys-totalai"
